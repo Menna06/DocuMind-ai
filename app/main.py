@@ -2,8 +2,7 @@
 
 import streamlit as st
 
-from app import __version__
-from app.utils.logging import setup_logging
+from app.utils.logger import setup_logging
 
 logger = setup_logging()
 
@@ -17,7 +16,6 @@ def main() -> None:
         layout="wide",
     )
     st.title("DocuMind AI")
-    st.caption(f"Version {__version__}")
     st.info(
         "Project skeleton initialized. Application features will be implemented "
         "in subsequent engineering tickets."

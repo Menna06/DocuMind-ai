@@ -1,9 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "documind-ai"
 version = "1.0.0"
 description = "Enterprise intelligent document search and question-answering platform powered by RAG."
 readme = "README.md"
 requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
 
 [tool.black]
 line-length = 88
