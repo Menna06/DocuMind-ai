@@ -26,10 +26,17 @@ def test_retrieve_context_returns_combined_document_text(
     mock_retriever = Mock()
     mock_retriever.retrieve.return_value = documents
 
+    mock_answer_generator = Mock()
+
     monkeypatch.setattr(
         pipeline_module,
         "DocumentRetriever",
         lambda: mock_retriever,
+    )
+    monkeypatch.setattr(
+        pipeline_module,
+        "DocumentAnswerGenerator",
+        lambda: mock_answer_generator,
     )
 
     pipeline = pipeline_module.RAGPipeline()
@@ -65,10 +72,17 @@ def test_retrieve_context_preserves_document_metadata(
     mock_retriever = Mock()
     mock_retriever.retrieve.return_value = documents
 
+    mock_answer_generator = Mock()
+
     monkeypatch.setattr(
         pipeline_module,
         "DocumentRetriever",
         lambda: mock_retriever,
+    )
+    monkeypatch.setattr(
+        pipeline_module,
+        "DocumentAnswerGenerator",
+        lambda: mock_answer_generator,
     )
 
     pipeline = pipeline_module.RAGPipeline()
@@ -85,10 +99,17 @@ def test_empty_query_returns_empty_result(monkeypatch) -> None:
     mock_retriever = Mock()
     mock_retriever.retrieve.return_value = []
 
+    mock_answer_generator = Mock()
+
     monkeypatch.setattr(
         pipeline_module,
         "DocumentRetriever",
         lambda: mock_retriever,
+    )
+    monkeypatch.setattr(
+        pipeline_module,
+        "DocumentAnswerGenerator",
+        lambda: mock_answer_generator,
     )
 
     pipeline = pipeline_module.RAGPipeline()
@@ -124,10 +145,17 @@ def test_documents_with_empty_content_are_excluded(
     mock_retriever = Mock()
     mock_retriever.retrieve.return_value = documents
 
+    mock_answer_generator = Mock()
+
     monkeypatch.setattr(
         pipeline_module,
         "DocumentRetriever",
         lambda: mock_retriever,
+    )
+    monkeypatch.setattr(
+        pipeline_module,
+        "DocumentAnswerGenerator",
+        lambda: mock_answer_generator,
     )
 
     pipeline = pipeline_module.RAGPipeline()
@@ -136,3 +164,104 @@ def test_documents_with_empty_content_are_excluded(
 
     assert result.context == "First chunk.\n\nThird chunk."
     assert result.documents == documents
+
+
+def test_query_returns_generated_answer_and_documents(
+    monkeypatch,
+) -> None:
+    """A query should return the generated answer and supporting documents."""
+
+    documents = [
+        Document(
+            page_content="The project used Java and Spring Boot.",
+            metadata={"source": "project.pdf", "page": 0},
+        ),
+        Document(
+            page_content="The application used PostgreSQL.",
+            metadata={"source": "project.pdf", "page": 1},
+        ),
+    ]
+
+    mock_retriever = Mock()
+    mock_retriever.retrieve.return_value = documents
+
+    mock_answer_generator = Mock()
+    mock_answer_generator.generate_answer.return_value = (
+        "The project used Java, Spring Boot, and PostgreSQL."
+    )
+
+    monkeypatch.setattr(
+        pipeline_module,
+        "DocumentRetriever",
+        lambda: mock_retriever,
+    )
+    monkeypatch.setattr(
+        pipeline_module,
+        "DocumentAnswerGenerator",
+        lambda: mock_answer_generator,
+    )
+
+    pipeline = pipeline_module.RAGPipeline()
+
+    result = pipeline.query("What technologies were used?")
+
+    assert result.answer == (
+        "The project used Java, Spring Boot, and PostgreSQL."
+    )
+    assert result.context == (
+        "The project used Java and Spring Boot.\n\n"
+        "The application used PostgreSQL."
+    )
+    assert result.documents == documents
+
+    mock_retriever.retrieve.assert_called_once_with(
+        "What technologies were used?"
+    )
+
+    mock_answer_generator.generate_answer.assert_called_once_with(
+        "What technologies were used?",
+        (
+            "The project used Java and Spring Boot.\n\n"
+            "The application used PostgreSQL."
+        ),
+    )
+
+
+def test_query_with_no_retrieved_documents_returns_empty_context(
+    monkeypatch,
+) -> None:
+    """A query without retrieved documents should preserve an empty context."""
+
+    mock_retriever = Mock()
+    mock_retriever.retrieve.return_value = []
+
+    mock_answer_generator = Mock()
+    mock_answer_generator.generate_answer.return_value = (
+        "The information is not available in the provided documents."
+    )
+
+    monkeypatch.setattr(
+        pipeline_module,
+        "DocumentRetriever",
+        lambda: mock_retriever,
+    )
+    monkeypatch.setattr(
+        pipeline_module,
+        "DocumentAnswerGenerator",
+        lambda: mock_answer_generator,
+    )
+
+    pipeline = pipeline_module.RAGPipeline()
+
+    result = pipeline.query("What does the document say?")
+
+    assert result.answer == (
+        "The information is not available in the provided documents."
+    )
+    assert result.context == ""
+    assert result.documents == []
+
+    mock_answer_generator.generate_answer.assert_called_once_with(
+        "What does the document say?",
+        "",
+    )
