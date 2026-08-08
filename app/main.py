@@ -1,25 +1,37 @@
-"""DocuMind AI Streamlit application entry point."""
+"""DocuMind Streamlit application entry point."""
 
 import streamlit as st
 
+from app.ui.home import render_home_page
+from app.ui.upload import render_upload_page
 from app.utils.logger import setup_logging
+
 
 logger = setup_logging()
 
 
 def main() -> None:
-    """Launch the DocuMind AI Streamlit application."""
+    """Launch the DocuMind application."""
+
     logger.info("Application started")
+
     st.set_page_config(
-        page_title="DocuMind AI",
-        page_icon="📄",
+        page_title="DocuMind",
+        page_icon="D",
         layout="wide",
     )
-    st.title("DocuMind AI")
-    st.info(
-        "Project skeleton initialized. Application features will be implemented "
-        "in subsequent engineering tickets."
+
+    st.sidebar.title("DocuMind")
+
+    page = st.sidebar.radio(
+        "Navigation",
+        ["Documents", "Upload"],
     )
+
+    if page == "Documents":
+        render_home_page()
+    else:
+        render_upload_page()
 
 
 if __name__ == "__main__":
