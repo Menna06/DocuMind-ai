@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from langchain_core.documents import Document
 
+from app.rag.llm import DocumentAnswerGenerator
 from app.rag.retriever import DocumentRetriever
 
 
@@ -15,11 +16,21 @@ class RetrievalResult:
     documents: list[Document]
 
 
+@dataclass(frozen=True)
+class RAGQueryResult:
+    """Represent a generated answer and its supporting documents."""
+
+    answer: str
+    context: str
+    documents: list[Document]
+
+
 class RAGPipeline:
-    """Coordinate document retrieval and context preparation."""
+    """Coordinate document retrieval and answer generation."""
 
     def __init__(self) -> None:
         self.retriever = DocumentRetriever()
+        self.answer_generator = DocumentAnswerGenerator()
 
     def retrieve_context(self, query: str) -> RetrievalResult:
         """Retrieve relevant documents and prepare their text as context."""
@@ -41,4 +52,20 @@ class RAGPipeline:
         return RetrievalResult(
             context="\n\n".join(context_parts),
             documents=documents,
+        )
+
+    def query(self, question: str) -> RAGQueryResult:
+        """Retrieve document context and generate a grounded answer."""
+
+        retrieval = self.retrieve_context(question)
+
+        answer = self.answer_generator.generate_answer(
+            question,
+            retrieval.context,
+        )
+
+        return RAGQueryResult(
+            answer=answer,
+            context=retrieval.context,
+            documents=retrieval.documents,
         )
