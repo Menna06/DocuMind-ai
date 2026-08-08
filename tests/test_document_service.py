@@ -2,10 +2,12 @@
 
 from io import BytesIO
 from types import SimpleNamespace
+from unittest.mock import Mock
+
+from langchain_core.documents import Document
 
 import app.services.document_service as document_service_module
 from app.services.document_service import DocumentService
-
 
 class FakeUploadedFile(BytesIO):
     """Provide a minimal uploaded-file interface for testing."""
@@ -117,3 +119,51 @@ def test_filename_is_restricted_to_storage_directory(
     assert saved_path == tmp_path / "outside.pdf"
     assert saved_path.parent == tmp_path
     assert saved_path.exists()
+
+def test_extract_document_returns_loaded_pages(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        document_service_module,
+        "UPLOAD_DIRECTORY",
+        tmp_path,
+    )
+
+    pdf_path = tmp_path / "sample.pdf"
+    pdf_path.write_bytes(b"test pdf content")
+
+    expected_documents = [
+        Document(
+            page_content="First page content",
+            metadata={"page": 0},
+        ),
+        Document(
+            page_content="Second page content",
+            metadata={"page": 1},
+        ),
+    ]
+
+    service = document_service_module.DocumentService()
+    service.loader = Mock()
+    service.loader.load.return_value = expected_documents
+
+    documents = service.extract_document("sample.pdf")
+
+    assert len(documents) == 2
+    assert documents[0].page_content == "First page content"
+    assert documents[1].page_content == "Second page content"
+    service.loader.load.assert_called_once_with(pdf_path)
+
+
+def test_extract_document_raises_for_missing_file(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        document_service_module,
+        "UPLOAD_DIRECTORY",
+        tmp_path,
+    )
+
+    service = document_service_module.DocumentService()
+
+    try:
+        service.extract_document("missing.pdf")
+        assert False, "Expected FileNotFoundError"
+    except FileNotFoundError as error:
+        assert "Document not found: missing.pdf" in str(error)

@@ -1,4 +1,4 @@
-"""Document upload and management service."""
+"""Document upload, management, and processing service."""
 
 from __future__ import annotations
 
@@ -6,6 +6,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 import shutil
+
+from langchain_core.documents import Document
+
+from app.rag.loader import PDFDocumentLoader
 
 
 UPLOAD_DIRECTORY = Path("data/uploads")
@@ -21,10 +25,11 @@ class DocumentMetadata:
 
 
 class DocumentService:
-    """Service responsible for document management."""
+    """Service responsible for document management and processing."""
 
     def __init__(self) -> None:
         UPLOAD_DIRECTORY.mkdir(parents=True, exist_ok=True)
+        self.loader = PDFDocumentLoader()
 
     def is_valid_pdf(self, uploaded_file) -> bool:
         """Return True if the uploaded file is a PDF."""
@@ -74,3 +79,14 @@ class DocumentService:
 
         if target.exists():
             target.unlink()
+
+    def extract_document(self, filename: str) -> list[Document]:
+        """Extract pages from a stored PDF."""
+
+        safe_filename = Path(filename).name
+        document_path = UPLOAD_DIRECTORY / safe_filename
+
+        if not document_path.exists():
+            raise FileNotFoundError(f"Document not found: {filename}")
+
+        return self.loader.load(document_path)
