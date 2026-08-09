@@ -2,6 +2,7 @@
 
 from unittest.mock import Mock
 
+import pytest
 from langchain_core.documents import Document
 
 import app.rag.ingestion as ingestion_module
@@ -164,3 +165,144 @@ def test_ingest_document_with_no_chunks_returns_empty_result(
     assert result.document_ids == []
 
     mock_vector_store.add_documents.assert_not_called()
+
+
+def test_ingest_document_wraps_missing_document_error(
+    monkeypatch,
+) -> None:
+    """Missing documents should raise an ingestion-level error."""
+
+    mock_document_service = Mock()
+    mock_document_service.extract_document.side_effect = FileNotFoundError(
+        "Document not found: missing.pdf"
+    )
+
+    monkeypatch.setattr(
+        ingestion_module,
+        "DocumentService",
+        lambda: mock_document_service,
+    )
+    monkeypatch.setattr(
+        ingestion_module,
+        "DocumentChunker",
+        lambda: Mock(),
+    )
+    monkeypatch.setattr(
+        ingestion_module,
+        "DocumentVectorStore",
+        lambda: Mock(),
+    )
+
+    service = ingestion_module.DocumentIngestionService()
+
+    with pytest.raises(
+        ingestion_module.DocumentIngestionError,
+        match="Unable to extract document 'missing.pdf'",
+    ) as error:
+        service.ingest_document("missing.pdf")
+
+    assert isinstance(error.value.__cause__, FileNotFoundError)
+
+
+def test_ingest_document_wraps_chunking_error(
+    monkeypatch,
+) -> None:
+    """Chunking failures should raise an ingestion-level error."""
+
+    pages = [
+        Document(
+            page_content="Page content.",
+            metadata={"source": "test.pdf", "page": 0},
+        ),
+    ]
+
+    mock_document_service = Mock()
+    mock_document_service.extract_document.return_value = pages
+
+    mock_chunker = Mock()
+    mock_chunker.split_documents.side_effect = RuntimeError(
+        "Chunking failed"
+    )
+
+    monkeypatch.setattr(
+        ingestion_module,
+        "DocumentService",
+        lambda: mock_document_service,
+    )
+    monkeypatch.setattr(
+        ingestion_module,
+        "DocumentChunker",
+        lambda: mock_chunker,
+    )
+    monkeypatch.setattr(
+        ingestion_module,
+        "DocumentVectorStore",
+        lambda: Mock(),
+    )
+
+    service = ingestion_module.DocumentIngestionService()
+
+    with pytest.raises(
+        ingestion_module.DocumentIngestionError,
+        match="Failed to chunk document 'test.pdf'",
+    ) as error:
+        service.ingest_document("test.pdf")
+
+    assert isinstance(error.value.__cause__, RuntimeError)
+
+
+def test_ingest_document_wraps_vector_store_error(
+    monkeypatch,
+) -> None:
+    """Vector-store failures should raise an ingestion-level error."""
+
+    pages = [
+        Document(
+            page_content="Page content.",
+            metadata={"source": "test.pdf", "page": 0},
+        ),
+    ]
+
+    chunks = [
+        Document(
+            page_content="Chunk content.",
+            metadata={"source": "test.pdf", "page": 0},
+        ),
+    ]
+
+    mock_document_service = Mock()
+    mock_document_service.extract_document.return_value = pages
+
+    mock_chunker = Mock()
+    mock_chunker.split_documents.return_value = chunks
+
+    mock_vector_store = Mock()
+    mock_vector_store.add_documents.side_effect = RuntimeError(
+        "Vector store unavailable"
+    )
+
+    monkeypatch.setattr(
+        ingestion_module,
+        "DocumentService",
+        lambda: mock_document_service,
+    )
+    monkeypatch.setattr(
+        ingestion_module,
+        "DocumentChunker",
+        lambda: mock_chunker,
+    )
+    monkeypatch.setattr(
+        ingestion_module,
+        "DocumentVectorStore",
+        lambda: mock_vector_store,
+    )
+
+    service = ingestion_module.DocumentIngestionService()
+
+    with pytest.raises(
+        ingestion_module.DocumentIngestionError,
+        match="Failed to index document 'test.pdf'",
+    ) as error:
+        service.ingest_document("test.pdf")
+
+    assert isinstance(error.value.__cause__, RuntimeError)
