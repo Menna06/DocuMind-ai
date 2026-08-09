@@ -9,6 +9,10 @@ from app.rag.vectorstore import DocumentVectorStore
 from app.services.document_service import DocumentService
 
 
+class DocumentIngestionError(Exception):
+    """Raised when document ingestion cannot be completed."""
+
+
 @dataclass(frozen=True)
 class IngestionResult:
     """Represent the outcome of indexing a document."""
@@ -30,7 +34,16 @@ class DocumentIngestionService:
     def ingest_document(self, filename: str) -> IngestionResult:
         """Extract, chunk, and index a stored PDF document."""
 
-        pages = self.document_service.extract_document(filename)
+        try:
+            pages = self.document_service.extract_document(filename)
+        except (FileNotFoundError, ValueError) as error:
+            raise DocumentIngestionError(
+                f"Unable to extract document '{filename}': {error}"
+            ) from error
+        except Exception as error:
+            raise DocumentIngestionError(
+                f"Failed to process document '{filename}'."
+            ) from error
 
         if not pages:
             return IngestionResult(
@@ -40,7 +53,12 @@ class DocumentIngestionService:
                 document_ids=[],
             )
 
-        chunks = self.chunker.split_documents(pages)
+        try:
+            chunks = self.chunker.split_documents(pages)
+        except Exception as error:
+            raise DocumentIngestionError(
+                f"Failed to chunk document '{filename}'."
+            ) from error
 
         if not chunks:
             return IngestionResult(
@@ -50,7 +68,12 @@ class DocumentIngestionService:
                 document_ids=[],
             )
 
-        document_ids = self.vector_store.add_documents(chunks)
+        try:
+            document_ids = self.vector_store.add_documents(chunks)
+        except Exception as error:
+            raise DocumentIngestionError(
+                f"Failed to index document '{filename}'."
+            ) from error
 
         return IngestionResult(
             filename=filename,
