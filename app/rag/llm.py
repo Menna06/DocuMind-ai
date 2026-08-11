@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 
 from app.config.settings import get_settings
@@ -21,16 +22,36 @@ class DocumentAnswerGenerator:
     def __init__(self) -> None:
         settings = get_settings()
 
-        if not settings.is_configured:
-            raise ValueError(
-                "OPENAI_API_KEY must be configured before generating answers."
+        if settings.llm_provider == "gemini":
+            if not settings.gemini_api_key.strip():
+                raise ValueError(
+                    "GEMINI_API_KEY must be configured "
+                    "before generating answers."
+                )
+
+            self.model = ChatGoogleGenerativeAI(
+                model=settings.gemini_chat_model,
+                google_api_key=settings.gemini_api_key,
+                temperature=0,
             )
 
-        self.model = ChatOpenAI(
-            model=settings.openai_chat_model,
-            api_key=settings.openai_api_key,
-            temperature=0,
-        )
+        elif settings.llm_provider == "openai":
+            if not settings.openai_api_key.strip():
+                raise ValueError(
+                    "OPENAI_API_KEY must be configured "
+                    "before generating answers."
+                )
+
+            self.model = ChatOpenAI(
+                model=settings.openai_chat_model,
+                api_key=settings.openai_api_key,
+                temperature=0,
+            )
+
+        else:
+            raise ValueError(
+                f"Unsupported LLM provider: {settings.llm_provider}"
+            )
 
     def generate_answer(self, question: str, context: str) -> str:
         """Generate an answer using only the supplied document context."""

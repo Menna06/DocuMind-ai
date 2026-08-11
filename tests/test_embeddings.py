@@ -12,7 +12,9 @@ from app.rag.embeddings import DocumentEmbedder
 def test_embed_documents_returns_embeddings(monkeypatch) -> None:
     """Document chunks should be converted into embedding vectors."""
 
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("LLM_PROVIDER", "gemini")
+    monkeypatch.setenv("EMBEDDING_PROVIDER", "gemini")
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
     embeddings_module.get_settings.cache_clear()
 
     mock_embeddings = Mock()
@@ -23,7 +25,7 @@ def test_embed_documents_returns_embeddings(monkeypatch) -> None:
 
     monkeypatch.setattr(
         embeddings_module,
-        "OpenAIEmbeddings",
+        "GoogleGenerativeAIEmbeddings",
         lambda **kwargs: mock_embeddings,
     )
 
@@ -59,14 +61,16 @@ def test_empty_document_list_returns_no_embeddings(
 ) -> None:
     """An empty document list should return an empty result."""
 
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("LLM_PROVIDER", "gemini")
+    monkeypatch.setenv("EMBEDDING_PROVIDER", "gemini")
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
     embeddings_module.get_settings.cache_clear()
 
     mock_embeddings = Mock()
 
     monkeypatch.setattr(
         embeddings_module,
-        "OpenAIEmbeddings",
+        "GoogleGenerativeAIEmbeddings",
         lambda **kwargs: mock_embeddings,
     )
 
@@ -77,16 +81,18 @@ def test_empty_document_list_returns_no_embeddings(
     mock_embeddings.embed_documents.assert_not_called()
 
 
-def test_missing_api_key_is_rejected(monkeypatch) -> None:
-    """Embedding generation should require an OpenAI API key."""
+def test_missing_gemini_api_key_is_rejected(monkeypatch) -> None:
+    """Gemini embeddings should require a Gemini API key."""
 
-    monkeypatch.setenv("OPENAI_API_KEY", "")
+    monkeypatch.setenv("LLM_PROVIDER", "gemini")
+    monkeypatch.setenv("EMBEDDING_PROVIDER", "gemini")
+    monkeypatch.setenv("GEMINI_API_KEY", "")
 
     embeddings_module.get_settings.cache_clear()
 
     with pytest.raises(
         ValueError,
-        match="OPENAI_API_KEY must be configured",
+        match="GEMINI_API_KEY must be configured",
     ):
         DocumentEmbedder()
 
