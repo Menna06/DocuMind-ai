@@ -1,4 +1,4 @@
-"""Semantic similarity retrieval from the vector store."""
+"""Diverse semantic retrieval from the vector store."""
 
 from langchain_core.documents import Document
 
@@ -7,14 +7,18 @@ from app.rag.vectorstore import DocumentVectorStore
 
 
 class DocumentRetriever:
-    """Retrieve relevant document chunks for a user query."""
+    """Retrieve relevant and diverse document chunks for a user query."""
 
     def __init__(self) -> None:
         self.vector_store = DocumentVectorStore()
         self.top_k = get_settings().retrieval_top_k
 
-    def retrieve(self, query: str, top_k: int | None = None) -> list[Document]:
-        """Return the most relevant document chunks for a query."""
+    def retrieve(
+        self,
+        query: str,
+        top_k: int | None = None,
+    ) -> list[Document]:
+        """Return relevant and diverse document chunks for a query."""
 
         if not query.strip():
             return []
@@ -24,7 +28,11 @@ class DocumentRetriever:
         if limit <= 0:
             return []
 
-        return self.vector_store.store.similarity_search(
+        fetch_k = max(limit * 4, 10)
+
+        return self.vector_store.store.max_marginal_relevance_search(
             query,
             k=limit,
+            fetch_k=fetch_k,
+            lambda_mult=0.5,
         )

@@ -32,7 +32,6 @@ class DocumentAnswerGenerator:
             self.model = ChatGoogleGenerativeAI(
                 model=settings.gemini_chat_model,
                 google_api_key=settings.gemini_api_key,
-                temperature=0,
             )
 
         elif settings.llm_provider == "openai":
@@ -78,4 +77,26 @@ class DocumentAnswerGenerator:
             ]
         )
 
-        return response.content
+        return self._extract_response_text(response.content)
+
+    @staticmethod
+    def _extract_response_text(content: object) -> str:
+        """Normalize Gemini/OpenAI response content into plain text."""
+
+        if isinstance(content, str):
+            return content
+
+        if isinstance(content, list):
+            text_parts: list[str] = []
+
+            for block in content:
+                if isinstance(block, dict):
+                    text = block.get("text")
+                    if isinstance(text, str):
+                        text_parts.append(text)
+                elif isinstance(block, str):
+                    text_parts.append(block)
+
+            return "\n".join(text_parts).strip()
+
+        return str(content)
