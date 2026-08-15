@@ -7,7 +7,6 @@ from app.ui.home import render_home_page
 from app.ui.styles import apply_global_styles
 from app.ui.upload import render_upload_page
 from app.utils.logger import setup_logging
-from app.ui.layout_showcase import render_layout_showcase
 
 logger = setup_logging()
 
@@ -39,7 +38,6 @@ def render_sidebar() -> str:
                 "Documents",
                 "Ask DocuMind",
                 "Upload",
-                "Layout System",
             ],
             label_visibility="collapsed",
         )
@@ -89,8 +87,6 @@ def main() -> None:
         render_home_page()
     elif page == "Ask DocuMind":
         render_chat_page()
-    elif page == "Layout System":
-        render_layout_showcase()
     else:
         render_upload_page()
 
