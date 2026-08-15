@@ -69,14 +69,48 @@ TYPOGRAPHY = {
 SPACING = {
     "xs": "4px",
     "sm": "8px",
-    "md": "16px",
-    "lg": "24px",
-    "xl": "32px",
-    "2xl": "48px",
+    "md": "12px",
+    "lg": "16px",
+    "xl": "24px",
+    "2xl": "32px",
+    "3xl": "48px",
+    "4xl": "64px",
+    "5xl": "80px",
 }
 
 RADIUS = {
     "sm": "6px",
     "md": "10px",
     "lg": "14px",
+}
+
+LAYOUT = {
+    "sidebar_width": "280px",
+    "content_max_width": "1200px",
+    "content_padding_x": "32px",
+    "content_padding_y": "48px",
+    "section_gap": "48px",
+    "component_gap": "16px",
+}
+
+CONTAINERS = {
+    "page": "1200px",
+    "reading": "760px",
+    "wide": "1200px",
+    "full": "100%",
+}
+
+DENSITY = {
+    "compact": {
+        "gap": "8px",
+        "padding": "8px",
+    },
+    "default": {
+        "gap": "16px",
+        "padding": "16px",
+    },
+    "spacious": {
+        "gap": "24px",
+        "padding": "24px",
+    },
 }
