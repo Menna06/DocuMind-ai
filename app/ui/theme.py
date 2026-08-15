@@ -40,6 +40,32 @@ COLORS = {
     "info": "#8E7AA8",
 }
 
+TYPOGRAPHY = {
+    "font_family": "JetBrains Mono",
+
+    # Structural hierarchy
+    "display": {
+        "family": "JetBrains Mono",
+        "weight": 600,
+    },
+    "heading": {
+        "family": "JetBrains Mono",
+        "weight": 600,
+    },
+
+    # Default interface typography
+    "body": {
+        "family": "JetBrains Mono",
+        "weight": 400,
+    },
+
+    # Accent / emphasis
+    "accent": {
+        "family": "JetBrains Mono",
+        "weight": 700,
+    },
+}
+
 SPACING = {
     "xs": "4px",
     "sm": "8px",

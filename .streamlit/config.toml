@@ -1,0 +1,20 @@
+[server]
+enableStaticServing = true
+
+[[theme.fontFaces]]
+family = "JetBrains Mono"
+url = "static/fonts/JetBrainsMono-Regular.woff2"
+style = "normal"
+weight = 400
+
+[[theme.fontFaces]]
+family = "JetBrains Mono"
+url = "static/fonts/JetBrainsMono-SemiBold.woff2"
+style = "normal"
+weight = 600
+
+[[theme.fontFaces]]
+family = "JetBrains Mono"
+url = "static/fonts/JetBrainsMono-Bold.woff2"
+style = "normal"
+weight = 700

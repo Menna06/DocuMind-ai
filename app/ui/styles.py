@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from app.ui.theme import COLORS, RADIUS
+from app.ui.theme import COLORS, RADIUS, TYPOGRAPHY
 
 
 def apply_global_styles() -> None:
@@ -28,22 +28,42 @@ def apply_global_styles() -> None:
         }}
 
 
-        /* =========================================================
-           TYPOGRAPHY COLORS
+               /* =========================================================
+           TYPOGRAPHY SYSTEM — UI-02
            ========================================================= */
+
+        html,
+        body,
+        .stApp {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace;
+        }}
 
         h1,
         h2,
         h3 {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-weight: {TYPOGRAPHY["heading"]["weight"]} !important;
             color: {COLORS["text_primary"]} !important;
+        }}
+
+        h1 {{
+            font-weight: {TYPOGRAPHY["display"]["weight"]} !important;
         }}
 
         p,
         label,
-        .stMarkdown {{
-            color: {COLORS["text_secondary"]};
+        .stMarkdown,
+        input,
+        textarea,
+        button {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace;
+            font-weight: {TYPOGRAPHY["body"]["weight"]};
         }}
 
+        .section-label {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace;
+            font-weight: {TYPOGRAPHY["accent"]["weight"]};
+        }}
 
         /* =========================================================
            SIDEBAR
