@@ -114,3 +114,64 @@ DENSITY = {
         "padding": "24px",
     },
 }
+
+BUTTONS = {
+    "primary": {
+        "background": COLORS["purple"],
+        "text": COLORS["text_primary"],
+        "border": COLORS["purple"],
+        "hover_background": COLORS["purple_hover"],
+        "hover_text": COLORS["text_primary"],
+        "hover_border": COLORS["purple_hover"],
+        "focus_ring": COLORS["purple"],
+        "disabled_background": COLORS["surface_elevated"],
+        "disabled_text": COLORS["text_disabled"],
+        "disabled_border": COLORS["border_subtle"],
+    },
+
+    "secondary": {
+        "background": "transparent",
+        "text": COLORS["purple"],
+        "border": COLORS["purple"],
+        "hover_background": COLORS["purple_subtle"],
+        "hover_text": COLORS["text_primary"],
+        "hover_border": COLORS["purple_hover"],
+        "focus_ring": COLORS["purple"],
+        "disabled_background": "transparent",
+        "disabled_text": COLORS["text_disabled"],
+        "disabled_border": COLORS["border_subtle"],
+    },
+
+    "ghost": {
+        "background": "transparent",
+        "text": COLORS["text_secondary"],
+        "border": "transparent",
+        "hover_background": COLORS["surface_hover"],
+        "hover_text": COLORS["text_primary"],
+        "hover_border": "transparent",
+        "focus_ring": COLORS["purple"],
+        "disabled_background": "transparent",
+        "disabled_text": COLORS["text_disabled"],
+        "disabled_border": "transparent",
+    },
+
+    "danger": {
+        "background": "transparent",
+        "text": COLORS["coral"],
+        "border": "transparent",
+        "hover_background": COLORS["coral_subtle"],
+        "hover_text": COLORS["coral_hover"],
+        "hover_border": "transparent",
+        "focus_ring": COLORS["coral"],
+        "disabled_background": "transparent",
+        "disabled_text": COLORS["text_disabled"],
+        "disabled_border": "transparent",
+    },
+
+    "height": "40px",
+    "padding_x": "16px",
+    "radius": RADIUS["md"],
+    "font_size": "0.82rem",
+    "font_weight": 600,
+    "transition": "all 150ms ease",
+}
