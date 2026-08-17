@@ -175,3 +175,51 @@ BUTTONS = {
     "font_weight": 600,
     "transition": "all 150ms ease",
 }
+
+INPUTS = {
+    "question": {
+        "background": COLORS["surface"],
+        "border": COLORS["border_default"],
+        "hover_border": COLORS["border_strong"],
+        "focus_border": COLORS["purple"],
+        "focus_ring": COLORS["purple_subtle"],
+        "text": COLORS["text_primary"],
+        "placeholder": COLORS["text_muted"],
+        "disabled_background": COLORS["surface_elevated"],
+        "disabled_border": COLORS["border_subtle"],
+        "disabled_text": COLORS["text_disabled"],
+        "error_border": "#FF4D6D",
+        "error_text": "#FF4D6D",
+    },
+
+    "answer": {
+        "background": COLORS["background"],
+
+        # Animated gradient
+        "gradient": (
+            "linear-gradient("
+            "90deg, "
+            "#FF8A00 0%, "
+            "#FF2D55 35%, "
+            "#8927DD 65%, "
+            "#FF8A00 100%"
+            ")"
+        ),
+
+        "animation_duration": "6s",
+    },
+
+    "dropzone": {
+        "background": COLORS["background"],
+        "border": COLORS["purple"],
+        "hover_border": COLORS["purple_hover"],
+        "drag_border": COLORS["purple_hover"],
+        "disabled_border": COLORS["border_default"],
+        "error_border": "#FF4D6D",
+        "text": COLORS["text_primary"],
+        "secondary_text": COLORS["text_secondary"],
+        "muted_text": COLORS["text_muted"],
+    },
+
+    "radius": RADIUS["lg"],
+}
