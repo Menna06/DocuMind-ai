@@ -1080,3 +1080,33 @@ def render_document_tile(
 
     with st.container(key=safe_key):
         st.html(tile_css + tile_html)
+
+
+def render_canvas_background(
+    image_path: str = "static/background.png",
+    key: str = "global-canvas",
+) -> None:
+    """
+    Render the reusable DocuMind canvas background using the provided
+    background image asset.
+    """
+    safe_key = _safe_key(f"documind-canvas-{key}")
+    path = Path(image_path)
+    if not path.exists():
+        return
+
+    bg_b64 = base64.b64encode(path.read_bytes()).decode("utf-8")
+
+    canvas_css = f"""
+    <style>
+    .stApp {{
+        background-color: {COLORS["background"]};
+        background-image: url("data:image/png;base64,{bg_b64}");
+        background-size: cover;
+        background-position: top right;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    </style>
+    """
+    st.html(canvas_css)

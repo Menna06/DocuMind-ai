@@ -1,12 +1,22 @@
-"""Global Streamlit styles for the DocuMind design system."""
-
+import base64
+from pathlib import Path
 import streamlit as st
 
-from app.ui.theme import COLORS, RADIUS, TYPOGRAPHY
+from app.ui.theme import COLORS, LAYOUT, RADIUS, TYPOGRAPHY
+
+
+def _load_background_image_base64(image_path: str = "static/background.png") -> str:
+    """Return the base64-encoded background image asset."""
+    path = Path(image_path)
+    if not path.exists():
+        return ""
+    return base64.b64encode(path.read_bytes()).decode("utf-8")
 
 
 def apply_global_styles() -> None:
     """Apply the shared DocuMind visual system."""
+
+    bg_b64 = _load_background_image_base64()
 
     st.markdown(
         f"""
@@ -17,18 +27,26 @@ def apply_global_styles() -> None:
            ========================================================= */
 
         .stApp {{
-            background: {COLORS["background"]};
+            background-color: {COLORS["background"]};
+            background-image: url("data:image/png;base64,{bg_b64}");
+            background-size: cover;
+            background-position: top right;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             color: {COLORS["text_primary"]};
         }}
 
         .main .block-container {{
-            max-width: 1200px;
+            max-width: {LAYOUT["content_max_width"]};
             padding-top: 2.5rem;
             padding-bottom: 4rem;
+            padding-left: {LAYOUT["content_padding_x"]};
+            padding-right: {LAYOUT["content_padding_x"]};
+            margin: 0 auto;
         }}
 
 
-               /* =========================================================
+        /* =========================================================
            TYPOGRAPHY SYSTEM — UI-02
            ========================================================= */
 
@@ -76,6 +94,8 @@ def apply_global_styles() -> None:
 
         [data-testid="stSidebar"] .block-container {{
             padding-top: 2rem;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
         }}
 
         .sidebar-brand {{
@@ -102,11 +122,44 @@ def apply_global_styles() -> None:
             color: {COLORS["text_muted"]};
             text-transform: uppercase;
             letter-spacing: 0.12em;
-            margin: 1.5rem 0 0.5rem 0;
+            font-weight: 700;
+            margin: 1.5rem 0 0.65rem 0;
         }}
 
-        [data-testid="stSidebar"] .stRadio label {{
+        [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] {{
+            gap: 4px;
+        }}
+
+        [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label {{
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: {RADIUS["sm"]};
+            padding: 8px 12px;
+            margin-bottom: 2px;
+            transition: all 150ms ease;
+            cursor: pointer;
+        }}
+
+        [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label:hover {{
+            background: {COLORS["surface_hover"]};
+        }}
+
+        [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label[data-checked="true"],
+        [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) {{
+            background: rgba(137, 39, 221, 0.12) !important;
+            border-color: rgba(137, 39, 221, 0.35) !important;
+        }}
+
+        [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label[data-checked="true"] p,
+        [data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) p {{
+            color: {COLORS["text_primary"]} !important;
+            font-weight: 600 !important;
+        }}
+
+        [data-testid="stSidebar"] [data-testid="stRadio"] label p {{
             color: {COLORS["text_secondary"]} !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.84rem !important;
         }}
 
 
@@ -182,7 +235,20 @@ def apply_global_styles() -> None:
             height: 7px;
             border-radius: 50%;
             background: {COLORS["success"]};
+            box-shadow: 0 0 6px rgba(121, 181, 138, 0.5);
             margin-right: 6px;
+            animation: documind-pulse-dot 2.4s infinite ease-in-out;
+        }}
+
+        @keyframes documind-pulse-dot {{
+            0%, 100% {{
+                opacity: 0.65;
+                box-shadow: 0 0 4px rgba(121, 181, 138, 0.4);
+            }}
+            50% {{
+                opacity: 1;
+                box-shadow: 0 0 8px rgba(121, 181, 138, 0.7);
+            }}
         }}
 
 
