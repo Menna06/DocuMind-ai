@@ -1,10 +1,19 @@
 """Reusable DocuMind UI components."""
 
+import base64
 import re
+from pathlib import Path
+from textwrap import dedent
 
 import streamlit as st
 
-from app.ui.theme import BUTTONS, COLORS, INPUTS
+from app.ui.theme import (
+    BUTTONS,
+    COLORS,
+    DOCUMENT_CARD,
+    DOCUMENT_TILE,
+    INPUTS,
+)
 
 
 def _safe_key(value: str) -> str:
@@ -17,6 +26,7 @@ def render_button(
     variant: str = "primary",
     key: str | None = None,
     disabled: bool = False,
+    icon: bool = False,
 ) -> bool:
     """Render a reusable DocuMind button using the design-system tokens."""
 
@@ -35,10 +45,13 @@ def render_button(
     st.markdown(
         f"""
         <style>
+
         .st-key-{container_key} button {{
             width: auto;
-            min-height: {BUTTONS["height"]};
-            padding: 0 {BUTTONS["padding_x"]};
+            min-height: 34px;
+
+            padding: 0 12px;
+
             border-radius: {BUTTONS["radius"]};
 
             font-family: "JetBrains Mono", monospace;
@@ -47,6 +60,7 @@ def render_button(
 
             background: {button["background"]};
             color: {button["text"]};
+
             border: 1px solid {button["border"]};
 
             box-shadow: none;
@@ -68,14 +82,54 @@ def render_button(
             color: {button["disabled_text"]};
             border-color: {button["disabled_border"]};
             opacity: 1;
-            cursor: not-allowed;
         }}
+
         </style>
         """,
         unsafe_allow_html=True,
     )
 
     with st.container(key=container_key):
+
+        if icon:
+            st.markdown(
+                f"""
+                <style>
+
+                .st-key-{container_key} button {{
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 8px !important;
+                }}
+
+                .st-key-{container_key} button::before {{
+                    content: "";
+                    width: 20px;
+                    height: 20px;
+                    display: inline-block;
+
+                    background-color: currentColor;
+
+                    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 3h6l1 2h4v2H4V5h4l1-2zm-3 6h12v11a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9zm3 2v7h2v-7H9zm4 0v7h2v-7h-2z'/%3E%3C/svg%3E");
+
+                    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 3h6l1 2h4v2H4V5h4l1-2zm-3 6h12v11a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9zm3 2v7h2v-7H9zm4 0v7h2v-7h-2z'/%3E%3C/svg%3E");
+
+                    -webkit-mask-repeat: no-repeat;
+                    mask-repeat: no-repeat;
+
+                    -webkit-mask-position: center;
+                    mask-position: center;
+
+                    -webkit-mask-size: contain;
+                    mask-size: contain;
+                }}
+
+                </style>
+                """,
+                unsafe_allow_html=True,
+            )
+
         return st.button(
             label,
             key=key,
@@ -120,13 +174,9 @@ def render_question_input(
         .st-key-{container_key}
         div[data-baseweb="input"] {{
             background: {input_config["background"]} !important;
-
             border: 1px solid {input_config["border"]} !important;
-
             border-radius: {INPUTS["radius"]} !important;
-
             box-shadow: none !important;
-
             transition:
                 border-color 150ms ease,
                 background 150ms ease;
@@ -136,28 +186,19 @@ def render_question_input(
         .st-key-{container_key}
         div[data-baseweb="input"]:focus-within {{
             background: {input_config["background"]} !important;
-
             border-color: {input_config["border"]} !important;
-
             box-shadow: none !important;
-
             outline: none !important;
         }}
 
         /* Actual input element */
         .st-key-{container_key} input {{
             background: transparent !important;
-
             color: {input_config["text"]} !important;
-
             border: none !important;
-
             outline: none !important;
-
             box-shadow: none !important;
-
             font-family: "JetBrains Mono", monospace !important;
-
             font-size: 1rem !important;
         }}
 
@@ -193,21 +234,15 @@ def render_question_input(
 
         .st-key-{container_key} .documind-input-help {{
             margin-top: 6px;
-
             color: {COLORS["text_muted"]};
-
             font-family: "JetBrains Mono", monospace;
-
             font-size: 0.75rem;
         }}
 
         .st-key-{container_key} .documind-input-error-text {{
             margin-top: 6px;
-
             color: {input_config["error_text"]};
-
             font-family: "JetBrains Mono", monospace;
-
             font-size: 0.75rem;
         }}
 
@@ -252,11 +287,9 @@ def render_answer_display(
             0% {{
                 background-position: 0% 50%;
             }}
-
             50% {{
                 background-position: 100% 50%;
             }}
-
             100% {{
                 background-position: 0% 50%;
             }}
@@ -266,16 +299,13 @@ def render_answer_display(
             position: relative;
             padding: 1px;
             border-radius: {INPUTS["radius"]};
-
             background: {answer_config["gradient"]};
             background-size: 300% 300%;
-
             animation:
                 documind-answer-gradient
                 {answer_config["animation_duration"]}
                 ease
                 infinite;
-
             box-shadow:
                 0 0 12px rgba(137, 39, 221, 0.18),
                 0 0 24px rgba(255, 45, 85, 0.08);
@@ -284,9 +314,7 @@ def render_answer_display(
         .documind-answer-content {{
             background: {answer_config["background"]};
             border-radius: calc({INPUTS["radius"]} - 1px);
-
             padding: 24px;
-
             color: {COLORS["text_primary"]};
             font-family: "JetBrains Mono", monospace;
             line-height: 1.7;
@@ -296,11 +324,8 @@ def render_answer_display(
             display: flex;
             align-items: center;
             gap: 8px;
-
             margin-bottom: 16px;
-
             color: {COLORS["text_primary"]};
-
             font-family: "JetBrains Mono", monospace;
             font-size: 0.75rem;
             font-weight: 700;
@@ -312,16 +337,12 @@ def render_answer_display(
             width: 6px;
             height: 6px;
             border-radius: 50%;
-
             background: {COLORS["purple"]};
-
-            box-shadow:
-                0 0 8px {COLORS["purple"]};
+            box-shadow: 0 0 8px {COLORS["purple"]};
         }}
 
         .documind-answer-text {{
             color: {COLORS["text_primary"]};
-
             font-family: "JetBrains Mono", monospace;
             font-size: 0.95rem;
             line-height: 1.75;
@@ -330,16 +351,13 @@ def render_answer_display(
 
         <div class="documind-answer-wrapper">
             <div class="documind-answer-content">
-
                 <div class="documind-answer-label">
                     <span>Answer</span>
                     <span class="documind-answer-dot"></span>
                 </div>
-
                 <div class="documind-answer-text">
                     {answer}
                 </div>
-
             </div>
         </div>
         """,
@@ -389,67 +407,36 @@ def render_document_dropzone(
             width: 100%;
         }}
 
-        /*
-         * Streamlit creates an outer file-uploader container
-         * around the actual dropzone.
-         *
-         * The outer container must NOT have its own border.
-         */
-
         .st-key-{container_key}
         [data-testid="stFileUploader"] {{
             background: transparent !important;
-
             border: none !important;
-
             padding: 0 !important;
-
             box-shadow: none !important;
         }}
-
-        /*
-         * This is the ONLY border in the component.
-         */
 
         .st-key-{container_key}
         [data-testid="stFileUploaderDropzone"] {{
             background: {dropzone["background"]} !important;
-
             border: 1px dashed {dropzone["border"]} !important;
-
             border-radius: {INPUTS["radius"]} !important;
-
             padding: 48px 32px !important;
-
             box-shadow: none !important;
-
             transition:
                 border-color 200ms ease,
                 background 200ms ease;
         }}
 
-        /*
-         * Calm hover state.
-         * Still only ONE purple dotted border.
-         */
-
         .st-key-{container_key}
         [data-testid="stFileUploaderDropzone"]:hover {{
             background: {dropzone["background"]} !important;
-
             border-color: {dropzone["hover_border"]} !important;
-
             box-shadow: none !important;
         }}
-
-        /*
-         * Upload instructions
-         */
 
         .st-key-{container_key}
         [data-testid="stFileUploaderDropzoneInstructions"] {{
             color: {dropzone["text"]} !important;
-
             font-family: "JetBrains Mono", monospace !important;
         }}
 
@@ -458,21 +445,13 @@ def render_document_dropzone(
             color: {dropzone["secondary_text"]} !important;
         }}
 
-        /*
-         * Native Streamlit upload button.
-         * Keep its functionality while preventing it from
-         * introducing another visual border treatment.
-         */
-
         .st-key-{container_key} button {{
             font-family: "JetBrains Mono", monospace !important;
-
             box-shadow: none !important;
         }}
 
         .st-key-{container_key} small {{
             color: {dropzone["muted_text"]} !important;
-
             font-family: "JetBrains Mono", monospace !important;
         }}
 
@@ -489,3 +468,615 @@ def render_document_dropzone(
             help="Maximum file size: 50MB",
             label_visibility="collapsed",
         )
+
+
+def _pdf_icon_html(icon_path: str) -> str:
+    """Return the approved PDF icon as an embedded image."""
+
+    path = Path(icon_path)
+
+    if not path.exists():
+        raise FileNotFoundError(
+            f"PDF icon asset not found: {icon_path}"
+        )
+
+    encoded = base64.b64encode(path.read_bytes()).decode("utf-8")
+
+    return (
+        f'<img src="data:image/png;base64,{encoded}" '
+        f'alt="PDF" '
+        f'style="'
+        f'width:{DOCUMENT_CARD["icon_size"]};'
+        f'height:{DOCUMENT_CARD["icon_size"]};'
+        f'object-fit:contain;'
+        f'display:block;'
+        f'">'
+    )
+
+
+def render_document_card(
+    filename: str,
+    pages: int,
+    file_size: str,
+    uploaded_at: str,
+    status: str = "ready",
+    icon_path: str = "static/icons/PDF-visual.png",
+    key: str | None = None,
+) -> dict[str, bool]:
+    """
+    Render the reusable DocuMind document card.
+
+    The entire visual card, divider, menu, and action row
+    remain inside one Streamlit container.
+    """
+
+    if status not in {"ready", "processing"}:
+        raise ValueError(
+            "Document status must be 'ready' or 'processing'."
+        )
+
+    safe_key = _safe_key(
+        f"document-card-{key or filename}"
+    )
+
+    icon_html = _pdf_icon_html(icon_path)
+
+    # ---------------------------------------------------------
+    # STATUS
+    # ---------------------------------------------------------
+
+    if status == "ready":
+        status_html = """
+            <div class="document-card-status">
+
+                <span class="document-status-badge document-status-ready">
+                    <span class="document-status-dot"></span>
+                    Indexed
+                </span>
+
+                <span class="document-status-badge document-status-ready">
+                    <span class="document-status-dot"></span>
+                    Ready for questions
+                </span>
+
+            </div>
+        """
+
+    else:
+        status_html = """
+            <div class="document-card-status">
+
+                <span class="document-status-badge document-status-processing">
+                    <span class="document-processing-dot"></span>
+                    Processing...
+                </span>
+
+            </div>
+        """
+
+    # ---------------------------------------------------------
+    # CARD CSS
+    # ---------------------------------------------------------
+
+    card_css = f"""
+    <style>
+
+        /* =====================================================
+           CARD SHELL
+           ===================================================== */
+
+        .st-key-{safe_key} {{
+            width: 100%;
+            box-sizing: border-box;
+
+            background: {DOCUMENT_CARD["background"]};
+            border: 1px solid {DOCUMENT_CARD["border"]};
+            border-radius: {DOCUMENT_CARD["radius"]};
+
+            padding: 24px 24px 14px 24px;
+
+            position: relative !important;
+            overflow: hidden;
+        }}
+
+
+        /* =====================================================
+           MAIN DOCUMENT AREA
+           ===================================================== */
+
+        .st-key-{safe_key} .document-card-main {{
+            width: 100%;
+
+            display: flex;
+            align-items: flex-start;
+
+            gap: 20px;
+
+            box-sizing: border-box;
+
+            padding-right: 44px;
+        }}
+
+
+        /* =====================================================
+           PDF ICON
+           ===================================================== */
+
+        .st-key-{safe_key} .document-card-icon {{
+            flex: 0 0 {DOCUMENT_CARD["icon_size"]};
+
+            width: {DOCUMENT_CARD["icon_size"]};
+            height: {DOCUMENT_CARD["icon_size"]};
+        }}
+
+        .st-key-{safe_key} .document-card-icon img {{
+            width: 100%;
+            height: 100%;
+
+            display: block;
+            object-fit: contain;
+        }}
+
+
+        /* =====================================================
+           CONTENT
+           ===================================================== */
+
+        .st-key-{safe_key} .document-card-content {{
+            flex: 1;
+            min-width: 0;
+        }}
+
+
+        /* =====================================================
+           TITLE
+           ===================================================== */
+
+        .st-key-{safe_key} .document-card-title {{
+            color: {COLORS["text_primary"]};
+
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1rem;
+            font-weight: 600;
+
+            line-height: 1.4;
+
+            margin: 1px 0 8px 0;
+
+            overflow-wrap: anywhere;
+        }}
+
+
+        /* =====================================================
+           METADATA
+           ===================================================== */
+
+        .st-key-{safe_key} .document-card-meta {{
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+            color: {DOCUMENT_CARD["metadata_color"]};
+
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.76rem;
+
+            line-height: 1.5;
+        }}
+
+        .st-key-{safe_key} .document-meta-dot {{
+            color: {COLORS["purple"]};
+
+            font-size: 0.9rem;
+            font-weight: 700;
+        }}
+
+
+        /* =====================================================
+           STATUS BADGES
+           ===================================================== */
+
+        .st-key-{safe_key} .document-card-status {{
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+            margin-top: 12px;
+        }}
+
+        .st-key-{safe_key} .document-status-badge {{
+            display: inline-flex;
+            align-items: center;
+
+            gap: 7px;
+
+            padding: 6px 12px;
+
+            border-radius: 999px;
+
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.72rem;
+            font-weight: 500;
+
+            line-height: 1;
+        }}
+
+        .st-key-{safe_key} .document-status-ready {{
+            color: {COLORS["success"]};
+
+            background: rgba(121, 181, 138, 0.08);
+
+            border: 1px solid rgba(121, 181, 138, 0.28);
+        }}
+
+        .st-key-{safe_key} .document-status-dot {{
+            width: 7px;
+            height: 7px;
+
+            flex: 0 0 7px;
+
+            border-radius: 50%;
+
+            background: {COLORS["success"]};
+
+            box-shadow:
+                0 0 6px rgba(121, 181, 138, 0.5);
+        }}
+
+        .st-key-{safe_key} .document-status-processing {{
+            color: {COLORS["purple"]};
+
+            background: rgba(124, 58, 237, 0.08);
+
+            border: 1px solid rgba(124, 58, 237, 0.32);
+        }}
+
+        .st-key-{safe_key} .document-processing-dot {{
+            width: 7px;
+            height: 7px;
+
+            flex: 0 0 7px;
+
+            border-radius: 50%;
+
+            border: 1px solid {COLORS["purple"]};
+
+            background: transparent;
+
+            animation:
+                document-processing-pulse
+                1.4s ease-in-out
+                infinite;
+        }}
+
+        @keyframes document-processing-pulse {{
+
+            0%, 100% {{
+                opacity: 0.45;
+            }}
+
+            50% {{
+                opacity: 1;
+            }}
+
+        }}
+
+
+        /* =====================================================
+           THREE DOT MENU
+           ===================================================== */
+
+        .st-key-{safe_key} .document-card-menu {{
+            position: absolute !important;
+
+            top: 14px !important;
+            right: 16px !important;
+
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 3px !important;
+
+            user-select: none !important;
+            pointer-events: none !important;
+            z-index: 10 !important;
+        }}
+
+        .st-key-{safe_key} .document-card-menu-dot {{
+            display: block !important;
+            width: 3.5px !important;
+            height: 3.5px !important;
+            border-radius: 50% !important;
+            background: {COLORS["text_secondary"]} !important;
+        }}
+
+
+        /* =====================================================
+           DIVIDER
+           ===================================================== */
+
+        .st-key-{safe_key} .document-card-divider {{
+            width: 100%;
+            height: 1px;
+
+            background: {DOCUMENT_CARD["divider"]};
+
+            margin: 16px 0 0 0 !important;
+            padding: 0 !important;
+        }}
+
+
+        /* =====================================================
+           REMOVE STREAMLIT VERTICAL GAPS
+           ===================================================== */
+
+        div.st-key-{safe_key},
+        .st-key-{safe_key},
+        .st-key-{safe_key} [data-testid="stVerticalBlock"],
+        .st-key-{safe_key} [data-testid="stVerticalBlockBorderWrapper"] {{
+            gap: 0 !important;
+        }}
+
+        .st-key-{safe_key} [data-testid="stElementContainer"] {{
+            margin: 0 !important;
+            padding: 0 !important;
+        }}
+
+
+        /* =====================================================
+           ACTION ROW
+           ===================================================== */
+
+        .st-key-{safe_key} [data-testid="stHorizontalBlock"] {{
+            width: 100% !important;
+
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+
+            margin-top: 10px !important;
+            margin-bottom: 0 !important;
+            padding: 0 !important;
+
+            gap: 0 !important;
+        }}
+
+        .st-key-{safe_key} [data-testid="stHorizontalBlock"] > div {{
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }}
+
+        .st-key-{safe_key} [data-testid="stHorizontalBlock"] > div:first-child {{
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+
+            width: auto !important;
+            flex: 0 0 auto !important;
+
+            padding: 0 !important;
+            margin: 0 !important;
+        }}
+
+        .st-key-{safe_key} [data-testid="stHorizontalBlock"] > div:last-child {{
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+
+            width: auto !important;
+            flex: 0 0 auto !important;
+            margin-left: auto !important;
+
+            padding: 0 !important;
+            margin: 0 !important;
+        }}
+
+
+        /* =====================================================
+           COMPACT BUTTONS FOR DOCUMENT CARD
+           ===================================================== */
+
+        .st-key-{safe_key} button {{
+            min-height: 28px !important;
+            height: 28px !important;
+            padding: 0 10px !important;
+            font-size: 0.76rem !important;
+            line-height: 1 !important;
+        }}
+
+        .st-key-{safe_key} button::before {{
+            width: 14px !important;
+            height: 14px !important;
+        }}
+
+    </style>
+    """
+
+    # ---------------------------------------------------------
+    # CARD CONTENT
+    # ---------------------------------------------------------
+
+    card_html = f"""
+        <div class="document-card-main">
+
+            <div class="document-card-icon">
+                {icon_html}
+            </div>
+
+            <div class="document-card-content">
+
+                <div class="document-card-title">
+                    {filename}
+                </div>
+
+                <div class="document-card-meta">
+
+                    <span>
+                        {pages} pages
+                    </span>
+
+                    <span class="document-meta-dot">
+                        •
+                    </span>
+
+                    <span>
+                        {file_size}
+                    </span>
+
+                    <span class="document-meta-dot">
+                        •
+                    </span>
+
+                    <span>
+                        Uploaded {uploaded_at}
+                    </span>
+
+                </div>
+
+                {status_html}
+
+            </div>
+
+        </div>
+
+        <div class="document-card-menu">
+            <span class="document-card-menu-dot"></span>
+            <span class="document-card-menu-dot"></span>
+            <span class="document-card-menu-dot"></span>
+        </div>
+
+        <div class="document-card-divider"></div>
+    """
+
+    # ---------------------------------------------------------
+    # ONE CARD CONTAINER
+    # ---------------------------------------------------------
+
+    with st.container(key=safe_key):
+
+        st.html(card_css)
+
+        st.html(card_html)
+
+        action_left, action_right = st.columns(
+            [1, 1],
+            gap="small",
+        )
+
+        with action_left:
+            view_text_clicked = render_button(
+                "View Text",
+                variant="secondary",
+                key=f"{safe_key}-view-text",
+            )
+
+        with action_right:
+            delete_clicked = render_button(
+                "Delete",
+                variant="danger",
+                key=f"{safe_key}-delete",
+                icon=True,
+            )
+
+    return {
+        "view_text": view_text_clicked,
+        "delete": delete_clicked,
+    }
+
+def render_document_tile(
+    icon_path: str = "static/icons/PDF-visual.png",
+    key: str | None = None,
+) -> None:
+    """
+    Render the reusable empty document visual tile.
+
+    The tile intentionally contains no text or actions.
+    The consuming page provides its own content around the
+    reusable visual treatment.
+    """
+
+    safe_key = _safe_key(
+        f"document-tile-{key or 'default'}"
+    )
+
+    icon_html = _pdf_icon_html(icon_path)
+
+    tile_css = dedent(
+        f"""
+        <style>
+
+        .st-key-{safe_key} {{
+            width: 100%;
+        }}
+
+        .st-key-{safe_key} .document-tile {{
+            width: 100%;
+            min-height: 150px;
+            box-sizing: border-box;
+
+            display: flex;
+            align-items: center;
+
+            background: {DOCUMENT_CARD["background"]};
+            border: 1px solid {DOCUMENT_CARD["border"]};
+            border-radius: {DOCUMENT_CARD["radius"]};
+
+            padding: 24px;
+            position: relative;
+        }}
+
+        .st-key-{safe_key} .document-tile-icon {{
+            width: {DOCUMENT_CARD["icon_size"]};
+            height: {DOCUMENT_CARD["icon_size"]};
+
+            flex: 0 0 {DOCUMENT_CARD["icon_size"]};
+        }}
+
+        .st-key-{safe_key} .document-tile-menu {{
+            position: absolute;
+            top: 14px;
+            right: 16px;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+
+            user-select: none;
+            pointer-events: none;
+        }}
+
+        .st-key-{safe_key} .document-tile-menu-dot {{
+            display: block;
+            width: 3.5px;
+            height: 3.5px;
+            border-radius: 50%;
+            background: {COLORS["text_secondary"]};
+        }}
+
+        </style>
+        """
+    )
+
+    tile_html = dedent(
+        f"""
+        <div class="document-tile">
+            <div class="document-tile-icon">
+                {icon_html}
+            </div>
+
+            <div class="document-tile-menu">
+                <span class="document-tile-menu-dot"></span>
+                <span class="document-tile-menu-dot"></span>
+                <span class="document-tile-menu-dot"></span>
+            </div>
+        </div>
+        """
+    )
+
+    with st.container(key=safe_key):
+        st.html(tile_css + tile_html)

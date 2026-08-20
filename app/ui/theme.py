@@ -223,3 +223,27 @@ INPUTS = {
 
     "radius": RADIUS["lg"],
 }
+
+DOCUMENT_CARD = {
+    "background": COLORS["surface"],
+    "border": COLORS["border_default"],
+    "border_hover": COLORS["border_strong"],
+    "radius": RADIUS["md"],
+    "padding": "20px",
+    "icon_size": "72px",
+    "divider": COLORS["border_subtle"],
+    "metadata_color": COLORS["text_secondary"],
+    "muted_color": COLORS["text_muted"],
+    "status_success": COLORS["success"],
+    "status_processing": COLORS["purple"],
+    "status_background": COLORS["surface_elevated"],
+}
+
+DOCUMENT_TILE = {
+    "background": COLORS["surface"],
+    "border": COLORS["border_default"],
+    "border_hover": COLORS["border_strong"],
+    "radius": RADIUS["md"],
+    "padding": "16px",
+    "icon_size": "52px",
+}
