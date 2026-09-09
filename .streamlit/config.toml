@@ -1,6 +1,13 @@
 [server]
 enableStaticServing = true
 
+[theme]
+base = "dark"
+primaryColor = "#FF6B6B"
+backgroundColor = "#0B080D"
+secondaryBackgroundColor = "#151217"
+textColor = "#FFFFFF"
+
 [[theme.fontFaces]]
 family = "JetBrains Mono"
 url = "static/fonts/JetBrainsMono-Regular.woff2"

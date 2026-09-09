@@ -85,7 +85,7 @@ RADIUS = {
 }
 
 LAYOUT = {
-    "sidebar_width": "280px",
+    "sidebar_width": "210px",
     "content_max_width": "1200px",
     "content_padding_x": "32px",
     "content_padding_y": "48px",
