@@ -3,6 +3,7 @@
 import streamlit as st
 
 from app.rag.pipeline import RAGPipeline
+from app.ui.components import render_button
 
 
 def render_chat_page() -> None:
@@ -19,11 +20,11 @@ def render_chat_page() -> None:
         placeholder="What does the document say about...?",
     )
 
-    if not question.strip():
-        st.info("Enter a question to search your documents.")
-        return
-
-    if st.button("Ask", type="primary"):
+    if render_button(
+        "Ask",
+        variant="primary",
+        key="ask",
+    ):
         try:
             pipeline = RAGPipeline()
 
@@ -52,7 +53,7 @@ def render_chat_page() -> None:
                             f"{index}. {source} • Page {page_display}"
                         )
                     else:
-                      st.caption(f"{index}. {source}")
+                        st.caption(f"{index}. {source}")
 
             else:
                 st.info(
@@ -62,4 +63,6 @@ def render_chat_page() -> None:
         except ValueError as error:
             st.error(str(error))
         except OSError as error:
-            st.error(f"Unable to access the document store: {error}")
+            st.error(
+                f"Unable to access the document store: {error}"
+            )

@@ -3,6 +3,7 @@
 import streamlit as st
 
 from app.services.document_service import DocumentService
+from app.ui.components import render_button
 
 
 TEXT_PREVIEW_LENGTH = 2000
@@ -34,10 +35,11 @@ def render_home_page() -> None:
             extract_key = f"extract_{document.filename}"
             confirmation_key = f"confirm_delete_{document.filename}"
 
-            if st.button(
-                "Extract Text",
-                key=extract_key,
-            ):
+            if render_button(
+            "Extract Text",
+           variant="secondary",
+            key=extract_key,
+             ):
                 st.session_state["selected_document"] = document.filename
 
             if st.session_state.get("selected_document") == document.filename:
@@ -80,10 +82,11 @@ def render_home_page() -> None:
                         f"Text extraction failed: {error}"
                     )
 
-            if st.button(
-                "Delete",
-                key=f"delete_{document.filename}",
-            ):
+            if render_button(
+    "Delete",
+    variant="danger",
+    key=f"delete_{document.filename}",
+):
                 st.session_state[confirmation_key] = True
 
             if st.session_state.get(confirmation_key, False):
@@ -94,10 +97,11 @@ def render_home_page() -> None:
                 confirm_col, cancel_col = st.columns(2)
 
                 with confirm_col:
-                    if st.button(
-                        "Confirm Delete",
-                        key=f"confirm_{document.filename}",
-                    ):
+                   if render_button(
+    "Confirm Delete",
+    variant="danger",
+    key=f"confirm_{document.filename}",
+):
                         try:
                             document_service.delete_document(
                                 document.filename
@@ -126,10 +130,11 @@ def render_home_page() -> None:
                             )
 
                 with cancel_col:
-                    if st.button(
-                        "Cancel",
-                        key=f"cancel_{document.filename}",
-                    ):
+                    if render_button(
+    "Cancel",
+    variant="secondary",
+    key=f"cancel_{document.filename}",
+):
                         st.session_state.pop(
                             confirmation_key,
                             None,
