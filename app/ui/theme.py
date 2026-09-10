@@ -2,7 +2,7 @@
 
 COLORS = {
     # Canvas
-    "background": "#100E11",
+    "background": "#020204",
 
     # Surfaces
     "surface": "#151217",
@@ -225,24 +225,24 @@ INPUTS = {
 }
 
 DOCUMENT_CARD = {
-    "background": COLORS["surface"],
-    "border": COLORS["border_default"],
-    "border_hover": COLORS["border_strong"],
+    "background": COLORS["background"],
+    "border": "#28222E",
+    "border_hover": "#403744",
     "radius": RADIUS["md"],
     "padding": "20px",
     "icon_size": "72px",
-    "divider": COLORS["border_subtle"],
+    "divider": "#211D24",
     "metadata_color": COLORS["text_secondary"],
     "muted_color": COLORS["text_muted"],
     "status_success": COLORS["success"],
     "status_processing": COLORS["purple"],
-    "status_background": COLORS["surface_elevated"],
+    "status_background": COLORS["background"],
 }
 
 DOCUMENT_TILE = {
-    "background": COLORS["surface"],
-    "border": COLORS["border_default"],
-    "border_hover": COLORS["border_strong"],
+    "background": COLORS["background"],
+    "border": "#28222E",
+    "border_hover": "#403744",
     "radius": RADIUS["md"],
     "padding": "16px",
     "icon_size": "52px",
