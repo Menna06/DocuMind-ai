@@ -27,6 +27,7 @@ def render_button(
     key: str | None = None,
     disabled: bool = False,
     icon: bool = False,
+    full_width: bool = False,
 ) -> bool:
     """Render a reusable DocuMind button using the design-system tokens."""
 
@@ -42,15 +43,40 @@ def render_button(
         f"documind-button-{variant}-{key or label}"
     )
 
+    width_rule = "width: 100% !important;" if full_width else "width: auto;"
+    height_rule = (
+        "height: 42px !important; min-height: 42px !important; max-height: 42px !important;"
+        if full_width
+        else "min-height: 34px;"
+    )
+    padding_rule = "padding: 0 18px !important;" if full_width else "padding: 0 12px;"
+    justify_rule = "justify-content: center !important;" if full_width else ""
+    line_height_rule = "line-height: 40px !important;" if full_width else ""
+    container_width = "width: 100% !important;" if full_width else ""
+
     st.markdown(
         f"""
         <style>
 
-        .st-key-{container_key} button {{
-            width: auto;
-            min-height: 34px;
+        .st-key-{container_key} {{
+            {container_width}
+            margin: 0 !important;
+            padding: 0 !important;
+        }}
 
-            padding: 0 12px;
+        .st-key-{container_key} [data-testid="stElementContainer"],
+        .st-key-{container_key} [data-testid="stButton"] {{
+            {container_width}
+            margin: 0 !important;
+            padding: 0 !important;
+        }}
+
+        .st-key-{container_key} button {{
+            {width_rule}
+            {height_rule}
+            {padding_rule}
+            {justify_rule}
+            {line_height_rule}
 
             border-radius: {BUTTONS["radius"]};
 
@@ -65,6 +91,10 @@ def render_button(
 
             box-shadow: none;
             transition: {BUTTONS["transition"]};
+            box-sizing: border-box !important;
+            margin: 0 !important;
+            display: inline-flex;
+            align-items: center;
         }}
 
         .st-key-{container_key} button:hover {{
@@ -502,6 +532,7 @@ def render_document_card(
     status: str = "ready",
     icon_path: str = "static/icons/PDF-visual.png",
     key: str | None = None,
+    pdf_bytes: bytes | None = None,
 ) -> dict[str, bool]:
     """
     Render the reusable DocuMind document card.
@@ -518,6 +549,14 @@ def render_document_card(
     safe_key = _safe_key(
         f"document-card-{key or filename}"
     )
+
+    if pdf_bytes is None:
+        candidate_path = Path("data/uploads") / filename
+        if candidate_path.exists():
+            try:
+                pdf_bytes = candidate_path.read_bytes()
+            except OSError:
+                pdf_bytes = None
 
     icon_html = _pdf_icon_html(icon_path)
 
@@ -569,14 +608,14 @@ def render_document_card(
             width: 100%;
             box-sizing: border-box;
 
-            background: {DOCUMENT_CARD["background"]};
-            border: 1px solid {DOCUMENT_CARD["border"]};
+            background: {DOCUMENT_CARD["background"]} !important;
+            border: 1px solid #28222E !important;
             border-radius: {DOCUMENT_CARD["radius"]};
 
             padding: 24px 24px 14px 24px;
 
             position: relative !important;
-            overflow: hidden;
+            overflow: visible !important;
         }}
 
 
@@ -767,31 +806,75 @@ def render_document_card(
 
 
         /* =====================================================
-           THREE DOT MENU
+           THREE DOT POPOVER POSITIONING & ARROW REMOVAL
            ===================================================== */
 
-        .st-key-{safe_key} .document-card-menu {{
+        .st-key-{safe_key}-popover,
+        .st-key-{safe_key} .st-key-{safe_key}-popover {{
             position: absolute !important;
-
-            top: 14px !important;
-            right: 16px !important;
-
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            gap: 3px !important;
-
-            user-select: none !important;
-            pointer-events: none !important;
-            z-index: 10 !important;
+            top: 16px !important;
+            right: 18px !important;
+            width: 28px !important;
+            height: 28px !important;
+            min-width: 28px !important;
+            max-width: 28px !important;
+            min-height: 28px !important;
+            max-height: 28px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            z-index: 25 !important;
         }}
 
-        .st-key-{safe_key} .document-card-menu-dot {{
-            display: block !important;
-            width: 3.5px !important;
-            height: 3.5px !important;
-            border-radius: 50% !important;
-            background: {COLORS["text_secondary"]} !important;
+        .st-key-{safe_key}-popover [data-testid="stPopover"],
+        .st-key-{safe_key}-popover [data-testid="stPopover"] > div,
+        .st-key-{safe_key}-popover [data-testid="stPopoverButton"],
+        .st-key-{safe_key}-popover button {{
+            position: relative !important;
+            width: 28px !important;
+            min-width: 28px !important;
+            max-width: 28px !important;
+            height: 28px !important;
+            min-height: 28px !important;
+            max-height: 28px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+        }}
+
+        /* Completely hide the arrow icon */
+        .st-key-{safe_key}-popover svg,
+        .st-key-{safe_key}-popover [data-testid="stIcon"],
+        .st-key-{safe_key}-popover [data-testid="stPopoverButton"] svg,
+        .st-key-{safe_key}-popover button svg,
+        .st-key-{safe_key}-popover button span:last-child:not(:only-child) {{
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            visibility: hidden !important;
+        }}
+
+        .st-key-{safe_key}-popover button p,
+        .st-key-{safe_key}-popover button span {{
+            font-size: 1.35rem !important;
+            line-height: 1 !important;
+            color: #77717B !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-weight: 700 !important;
+            letter-spacing: 0 !important;
+        }}
+
+        .st-key-{safe_key}-popover button:hover p,
+        .st-key-{safe_key}-popover button:hover span {{
+            color: #F5F2F6 !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-radius: 6px !important;
         }}
 
 
@@ -883,14 +966,35 @@ def render_document_card(
         .st-key-{safe_key} button {{
             min-height: 28px !important;
             height: 28px !important;
-            padding: 0 10px !important;
-            font-size: 0.76rem !important;
+            padding: 0 4px !important;
+            font-size: 0.78rem !important;
             line-height: 1 !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
         }}
 
         .st-key-{safe_key} button::before {{
             width: 14px !important;
             height: 14px !important;
+        }}
+
+        .st-key-{safe_key} [data-testid="stHorizontalBlock"] > div:first-child button {{
+            color: {COLORS["purple"]} !important;
+        }}
+
+        .st-key-{safe_key} [data-testid="stHorizontalBlock"] > div:first-child button:hover {{
+            color: {COLORS["purple_hover"]} !important;
+            background: transparent !important;
+        }}
+
+        .st-key-{safe_key} [data-testid="stHorizontalBlock"] > div:last-child button {{
+            color: {COLORS["coral"]} !important;
+        }}
+
+        .st-key-{safe_key} [data-testid="stHorizontalBlock"] > div:last-child button:hover {{
+            color: {COLORS["coral_hover"]} !important;
+            background: transparent !important;
         }}
 
     </style>
@@ -916,7 +1020,7 @@ def render_document_card(
                 <div class="document-card-meta">
 
                     <span>
-                        {pages} pages
+                        {pages} {'page' if pages == 1 else 'pages'}
                     </span>
 
                     <span class="document-meta-dot">
@@ -943,12 +1047,6 @@ def render_document_card(
 
         </div>
 
-        <div class="document-card-menu">
-            <span class="document-card-menu-dot"></span>
-            <span class="document-card-menu-dot"></span>
-            <span class="document-card-menu-dot"></span>
-        </div>
-
         <div class="document-card-divider"></div>
     """
 
@@ -959,8 +1057,38 @@ def render_document_card(
     with st.container(key=safe_key):
 
         st.html(card_css)
-
         st.html(card_html)
+
+        # 3-dots Popover Menu (positioned in top-right corner, no arrow, clean labels)
+        details_clicked = False
+        menu_delete_clicked = False
+        with st.popover("⋮", key=f"{safe_key}-popover"):
+            if pdf_bytes:
+                st.download_button(
+                    "Download PDF",
+                    data=pdf_bytes,
+                    file_name=filename,
+                    mime="application/pdf",
+                    key=f"{safe_key}-download",
+                    use_container_width=True,
+                )
+            else:
+                st.button(
+                    "Download PDF",
+                    key=f"{safe_key}-dl-disabled",
+                    disabled=True,
+                    use_container_width=True,
+                )
+            details_clicked = st.button(
+                "File Details",
+                key=f"{safe_key}-details",
+                use_container_width=True,
+            )
+            menu_delete_clicked = st.button(
+                "Delete Document",
+                key=f"{safe_key}-menu-delete",
+                use_container_width=True,
+            )
 
         action_left, action_right = st.columns(
             [1, 1],
@@ -984,7 +1112,8 @@ def render_document_card(
 
     return {
         "view_text": view_text_clicked,
-        "delete": delete_clicked,
+        "delete": delete_clicked or menu_delete_clicked,
+        "view_details": details_clicked,
     }
 
 def render_document_tile(
@@ -1101,11 +1230,17 @@ def render_canvas_background(
     <style>
     .stApp {{
         background-color: {COLORS["background"]};
-        background-image: url("data:image/png;base64,{bg_b64}");
-        background-size: cover;
-        background-position: top right;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
+        color: {COLORS["text_primary"]};
+    }}
+    [data-testid="stMain"],
+    .stMain,
+    section.main {{
+        background-color: {COLORS["background"]} !important;
+        background-image: url("data:image/png;base64,{bg_b64}") !important;
+        background-size: 100% auto !important;
+        background-position: top right !important;
+        background-repeat: no-repeat !important;
+        background-attachment: local !important;
     }}
     </style>
     """
