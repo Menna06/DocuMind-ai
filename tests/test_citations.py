@@ -1,6 +1,5 @@
 """Tests for grounded evidence extraction and citation filtering (app.rag.citations)."""
 
-import pytest
 from langchain_core.documents import Document
 
 from app.rag.citations import (

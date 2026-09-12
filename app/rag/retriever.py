@@ -45,7 +45,7 @@ class DocumentRetriever:
             if not normalized:
                 continue
 
-            sig = normalized[:200]
+            sig = normalized
             if sig not in seen_signatures:
                 seen_signatures.add(sig)
                 deduplicated.append(doc)

@@ -56,13 +56,12 @@ def _chunks_overlap(t1: str, t2: str, min_chars: int = 50) -> bool:
     if min_chars > len(norm1) or min_chars > len(norm2):
         return False
 
-    step = max(10, min_chars // 3)
-    for i in range(0, len(norm1) - min_chars + 1, step):
-        segment = norm1[i : i + min_chars]
-        if segment in norm2:
+    for i in range(len(norm1) - min_chars + 1):
+        if norm1[i : i + min_chars] in norm2:
             return True
 
     return False
+
 
 
 _NOT_FOUND_PATTERNS = [
@@ -121,7 +120,7 @@ def extract_evidence_sources(
             continue
 
         # Deduplicate exact text
-        text_signature = norm_content[:240]
+        text_signature = norm_content
         if text_signature in seen_texts:
             continue
         seen_texts.add(text_signature)
