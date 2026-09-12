@@ -126,3 +126,68 @@ def test_non_positive_top_k_returns_no_documents(monkeypatch) -> None:
     assert retriever.retrieve("Test query", top_k=0) == []
 
     mock_vector_store.store.max_marginal_relevance_search.assert_not_called()
+
+
+def test_retrieve_filters_empty_documents(monkeypatch) -> None:
+    """Empty document chunks should not be returned."""
+
+    documents = [
+        Document(page_content="Useful chunk.", metadata={"source": "test.pdf"}),
+        Document(page_content="   ", metadata={"source": "test.pdf"}),
+        Document(page_content="\n\t", metadata={"source": "test.pdf"}),
+    ]
+
+    mock_vector_store = Mock()
+    mock_vector_store.store.max_marginal_relevance_search.return_value = documents
+
+    monkeypatch.setattr(
+        retriever_module,
+        "DocumentVectorStore",
+        lambda: mock_vector_store,
+    )
+    monkeypatch.setattr(
+        retriever_module,
+        "get_settings",
+        lambda: Mock(retrieval_top_k=5),
+    )
+
+    retriever = retriever_module.DocumentRetriever()
+
+    assert retriever.retrieve("Test query") == [documents[0]]
+
+
+def test_retrieve_deduplicates_documents(monkeypatch) -> None:
+    """Duplicate document chunks should only be returned once."""
+
+    documents = [
+        Document(
+            page_content="Same chunk with   extra whitespace.",
+            metadata={"source": "test.pdf", "page": 0},
+        ),
+        Document(
+            page_content="Same   chunk with extra whitespace.",
+            metadata={"source": "test.pdf", "page": 1},
+        ),
+        Document(
+            page_content="A different chunk.",
+            metadata={"source": "test.pdf", "page": 2},
+        ),
+    ]
+
+    mock_vector_store = Mock()
+    mock_vector_store.store.max_marginal_relevance_search.return_value = documents
+
+    monkeypatch.setattr(
+        retriever_module,
+        "DocumentVectorStore",
+        lambda: mock_vector_store,
+    )
+    monkeypatch.setattr(
+        retriever_module,
+        "get_settings",
+        lambda: Mock(retrieval_top_k=5),
+    )
+
+    retriever = retriever_module.DocumentRetriever()
+
+    assert retriever.retrieve("Test query") == [documents[0], documents[2]]
