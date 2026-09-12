@@ -30,9 +30,24 @@ class DocumentRetriever:
 
         fetch_k = max(limit * 4, 10)
 
-        return self.vector_store.store.max_marginal_relevance_search(
+        raw_documents = self.vector_store.store.max_marginal_relevance_search(
             query,
             k=limit,
             fetch_k=fetch_k,
             lambda_mult=0.5,
         )
+
+        seen_signatures: set[str] = set()
+        deduplicated: list[Document] = []
+
+        for doc in raw_documents:
+            normalized = " ".join(doc.page_content.split())
+            if not normalized:
+                continue
+
+            sig = normalized
+            if sig not in seen_signatures:
+                seen_signatures.add(sig)
+                deduplicated.append(doc)
+
+        return deduplicated
