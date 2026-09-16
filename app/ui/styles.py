@@ -1736,6 +1736,539 @@ div[data-testid="stSidebarUserContent"],
         }}
 
         /* =========================================================
+           TICKET 10: ASK DOCUMIND WEBPAGE
+           ========================================================= */
+
+        /* Header Layout & Typography */
+        .ask-top-bar {{
+            display: flex !important;
+            justify-content: flex-end !important;
+            align-items: center !important;
+            margin-top: -3.6rem !important;
+            margin-bottom: 0.4rem !important;
+            width: 100% !important;
+        }}
+
+        .ask-header {{
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 5px !important;
+            margin-top: -0.8rem !important;
+            margin-bottom: 4.25rem !important;
+        }}
+
+        .ask-title {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 2.25rem !important;
+            font-weight: 600 !important;
+            color: #FFFFFF !important;
+            letter-spacing: -0.02em !important;
+            line-height: 1.15 !important;
+            margin: 0 !important;
+        }}
+
+        .ask-subtitle {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.74rem !important;
+            color: #8E8896 !important;
+            line-height: 1.5 !important;
+            margin: 0 !important;
+        }}
+
+        .ask-status-pill {{
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            background: {COLORS["background"]} !important;
+            border: 1px solid #28222E !important;
+            border-radius: 9999px !important;
+            padding: 6px 14px !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.72rem !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.12em !important;
+            text-transform: uppercase !important;
+            color: #FFFFFF !important;
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+            box-shadow: none !important;
+        }}
+
+        .ask-status-dot {{
+            width: 7px !important;
+            height: 7px !important;
+            border-radius: 50% !important;
+            background-color: {COLORS["coral"]} !important;
+            display: inline-block !important;
+            flex-shrink: 0 !important;
+        }}
+
+        /* Question Input Card */
+        .st-key-ask_prompt_card > div:first-child {{
+            background: {COLORS["background"]} !important;
+            border: 1px solid #28222E !important;
+            border-radius: 12px !important;
+            padding: 16px 20px 14px 20px !important;
+            transition: border-color 200ms ease, box-shadow 200ms ease !important;
+            box-sizing: border-box !important;
+            margin-bottom: 1.4rem !important;
+            width: 100% !important;
+        }}
+
+        .st-key-ask_prompt_card > div:first-child:focus-within {{
+            border-color: {COLORS["purple"]} !important;
+            box-shadow: 0 0 0 1px rgba(137, 39, 221, 0.35) !important;
+        }}
+
+        /* Reset all internal child containers so they have NO borders or padding */
+        .st-key-ask_prompt_card [data-testid="stVerticalBlock"],
+        .st-key-ask_prompt_card [data-testid="stVerticalBlockBorderWrapper"],
+        .st-key-ask_prompt_card [data-testid="stHorizontalBlock"],
+        .st-key-ask_prompt_card [data-testid="stColumn"],
+        .st-key-ask_prompt_card [data-testid="stColumn"] > div,
+        .st-key-ask_prompt_card [data-testid="stElementContainer"],
+        .st-key-ask_prompt_card [data-testid="stForm"] {{
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }}
+
+        /* Inner box inside Question Bar */
+        .st-key-ask_prompt_card [data-testid="stTextInputRootElement"] {{
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid #28222E !important;
+            border-radius: 8px !important;
+            box-shadow: none !important;
+            transition: border-color 200ms ease, box-shadow 200ms ease, background 200ms ease !important;
+            min-height: 44px !important;
+            height: auto !important;
+            padding: 2px 4px !important;
+            margin-bottom: 12px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }}
+
+        .st-key-ask_prompt_card [data-testid="stTextInputRootElement"]:hover {{
+            border-color: #382F40 !important;
+        }}
+
+        /* Subtle, soft, and calm focus state (replaces bright orange with soft lavender-violet) */
+        .st-key-ask_prompt_card [data-testid="stTextInputRootElement"]:focus,
+        .st-key-ask_prompt_card [data-testid="stTextInputRootElement"]:focus-within,
+        .st-key-ask_prompt_card [data-testid="stTextInput"]:focus [data-testid="stTextInputRootElement"],
+        .st-key-ask_prompt_card [data-testid="stTextInput"]:focus-within [data-testid="stTextInputRootElement"] {{
+            border: 1px solid rgba(137, 39, 221, 0.4) !important;
+            border-color: rgba(137, 39, 221, 0.4) !important;
+            background: rgba(137, 39, 221, 0.03) !important;
+            box-shadow: 0 0 0 1px rgba(137, 39, 221, 0.18) !important;
+            outline: none !important;
+        }}
+
+        /* Reset inner BaseWeb and textarea containers */
+        .st-key-ask_prompt_card [data-testid="stTextArea"],
+        .st-key-ask_prompt_card [data-testid="stTextArea"] > div,
+        .st-key-ask_prompt_card [data-baseweb="input"],
+        .st-key-ask_prompt_card [data-baseweb="input"] > div,
+        .st-key-ask_prompt_card [data-baseweb="base-input"],
+        .st-key-ask_prompt_card [data-baseweb="base-input"] > div,
+        .st-key-ask_prompt_card [data-baseweb="textarea"],
+        .st-key-ask_prompt_card [data-baseweb="textarea"] > div {{
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            outline: none !important;
+        }}
+
+        /* Suppress all focus brackets, outlines, borders, and rings on all inner input elements */
+        .st-key-ask_prompt_card [data-testid="stTextArea"]:focus,
+        .st-key-ask_prompt_card [data-testid="stTextArea"]:focus-within,
+        .st-key-ask_prompt_card [data-baseweb="input"]:focus,
+        .st-key-ask_prompt_card [data-baseweb="input"]:focus-within,
+        .st-key-ask_prompt_card [data-baseweb="input"] *:focus,
+        .st-key-ask_prompt_card [data-baseweb="input"] *:focus-within,
+        .st-key-ask_prompt_card [data-baseweb="base-input"]:focus,
+        .st-key-ask_prompt_card [data-baseweb="base-input"]:focus-within,
+        .st-key-ask_prompt_card [data-baseweb="base-input"] *:focus,
+        .st-key-ask_prompt_card [data-baseweb="base-input"] *:focus-within,
+        .st-key-ask_prompt_card [data-baseweb="textarea"]:focus,
+        .st-key-ask_prompt_card [data-baseweb="textarea"]:focus-within,
+        .st-key-ask_prompt_card [data-baseweb="textarea"] *:focus,
+        .st-key-ask_prompt_card [data-baseweb="textarea"] *:focus-within,
+        .st-key-ask_prompt_card input:focus,
+        .st-key-ask_prompt_card input:focus-visible,
+        .st-key-ask_prompt_card textarea:focus,
+        .st-key-ask_prompt_card textarea:focus-visible {{
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+        }}
+
+        .st-key-ask_prompt_card input,
+        .st-key-ask_prompt_card textarea {{
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #FFFFFF !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.95rem !important;
+            line-height: 1.55 !important;
+            padding: 6px 12px !important;
+            resize: none !important;
+            outline: none !important;
+            min-height: 38px !important;
+        }}
+
+        .st-key-ask_prompt_card input::placeholder,
+        .st-key-ask_prompt_card textarea::placeholder {{
+            color: #77717B !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.95rem !important;
+        }}
+
+        .st-key-ask_prompt_card [data-testid="stTextInputInstructions"],
+        .st-key-ask_prompt_card [data-testid="stTextAreaInstructions"],
+        .st-key-ask_prompt_card [data-testid="InputInstructions"] {{
+            display: none !important;
+        }}
+
+        /* Hint & Submit Button in Prompt Card */
+        .ask-card-hint {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.78rem !important;
+            color: #77717B !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 7px !important;
+            user-select: none !important;
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+        }}
+
+        .ask-card-hint span {{
+            color: #77717B !important;
+            font-size: 0.85rem !important;
+        }}
+
+        .st-key-ask_prompt_card [data-testid="stColumn"]:last-child,
+        .st-key-ask_prompt_card [data-testid="stColumn"]:last-child > div,
+        .st-key-ask_prompt_card [data-testid="stColumn"]:last-child [data-testid="stVerticalBlock"],
+        .st-key-ask_prompt_card [data-testid="stColumn"]:last-child [data-testid="stElementContainer"],
+        .st-key-ask_prompt_card .st-key-ask_submit_btn_wrapper,
+        .st-key-ask_prompt_card .st-key-ask_submit_btn_wrapper > div,
+        .st-key-ask_prompt_card [data-testid="stFormSubmitButton"] {{
+            display: flex !important;
+            justify-content: flex-end !important;
+            align-items: center !important;
+            text-align: right !important;
+            width: 100% !important;
+            margin-left: auto !important;
+        }}
+
+        .st-key-ask_prompt_card [data-testid="stFormSubmitButton"] button,
+        .st-key-ask_prompt_card button[kind="primaryFormSubmit"],
+        .st-key-ask_prompt_card button[data-testid="stBaseButton-primaryFormSubmit"] {{
+            background: #6E2AC8 !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.85rem !important;
+            font-weight: 500 !important;
+            padding: 7px 22px !important;
+            min-height: 36px !important;
+            height: 36px !important;
+            transition: background 150ms ease, transform 100ms ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            box-shadow: none !important;
+            cursor: pointer !important;
+            margin: 0 !important;
+            margin-left: auto !important;
+            margin-right: 0 !important;
+            float: right !important;
+        }}
+
+        .st-key-ask_prompt_card [data-testid="stFormSubmitButton"] button:hover,
+        .st-key-ask_prompt_card button[kind="primaryFormSubmit"]:hover {{
+            background: #8927DD !important;
+            color: #FFFFFF !important;
+        }}
+
+        .st-key-ask_prompt_card [data-testid="stFormSubmitButton"] button:active,
+        .st-key-ask_prompt_card button[kind="primaryFormSubmit"]:active {{
+            background: #5B21A6 !important;
+            transform: scale(0.98) !important;
+        }}
+
+        /* Section Headers (ANSWER, EVIDENCE) */
+        .ask-section-header {{
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.76rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.12em !important;
+            text-transform: uppercase !important;
+            color: #FFFFFF !important;
+            margin-top: 1.35rem !important;
+            margin-bottom: 0.75rem !important;
+        }}
+
+        .ask-section-dot {{
+            width: 6px !important;
+            height: 6px !important;
+            border-radius: 50% !important;
+            background-color: {COLORS["purple"]} !important;
+            display: inline-block !important;
+        }}
+
+        /* Answer Card & Layout Width */
+        .documind-answer-wrapper,
+        .st-key-ask_evidence_box,
+        .st-key-ask_evidence_box > div,
+        .st-key-ask_answer_box,
+        .st-key-ask_answer_box > div,
+        .ask-answer-card {{
+            width: 100% !important;
+        }}
+
+        .st-key-ask_answer_box,
+        .st-key-ask_answer_box > div,
+        .ask-answer-card {{
+            background: {COLORS["background"]} !important;
+            border: 1px solid rgba(137, 39, 221, 0.45) !important;
+            border-radius: 12px !important;
+            padding: 24px 28px !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.88rem !important;
+            line-height: 1.68 !important;
+            color: #E4E1E6 !important;
+            box-sizing: border-box !important;
+            margin-bottom: 1.25rem !important;
+        }}
+
+        .st-key-ask_answer_box [data-testid="stMarkdownContainer"] p,
+        .ask-answer-card p {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.88rem !important;
+            line-height: 1.68 !important;
+            color: #E4E1E6 !important;
+            margin-bottom: 12px !important;
+        }}
+
+        .st-key-ask_answer_box [data-testid="stMarkdownContainer"] p:last-child,
+        .ask-answer-card p:last-child {{
+            margin-bottom: 0 !important;
+        }}
+
+        .st-key-ask_answer_box ul,
+        .ask-answer-card ul {{
+            margin-top: 8px !important;
+            margin-bottom: 12px !important;
+            padding-left: 22px !important;
+        }}
+
+        .st-key-ask_answer_box li,
+        .ask-answer-card li {{
+            margin-bottom: 6px !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.88rem !important;
+            line-height: 1.6 !important;
+            color: #E4E1E6 !important;
+        }}
+
+        .st-key-ask_answer_box li::marker,
+        .ask-answer-card li::marker {{
+            color: {COLORS["coral"]} !important;
+            font-size: 1.1em !important;
+        }}
+
+        /* Evidence Section & Cards */
+        .ask-evidence-grid {{
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 16px !important;
+            margin-bottom: 1.25rem !important;
+        }}
+
+        .ask-evidence-card {{
+            background: {COLORS["background"]} !important;
+            border: 1px solid #28222E !important;
+            border-radius: 12px !important;
+            padding: 16px 18px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            min-height: 86px !important;
+            box-sizing: border-box !important;
+            transition: border-color 150ms ease, background 150ms ease !important;
+        }}
+
+        .ask-evidence-card:hover {{
+            border-color: #4A3B57 !important;
+        }}
+
+        .ask-evidence-top {{
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+        }}
+
+        .ask-pdf-box {{
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            max-width: 36px !important;
+            min-height: 36px !important;
+            max-height: 36px !important;
+            border-radius: 8px !important;
+            border: 1px solid rgba(137, 39, 221, 0.7) !important;
+            background: rgba(137, 39, 221, 0.08) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+        }}
+
+        .ask-pdf-box img {{
+            width: 22px !important;
+            height: 22px !important;
+            object-fit: contain !important;
+            display: block !important;
+        }}
+
+        .ask-evidence-filename {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.82rem !important;
+            font-weight: 500 !important;
+            color: #FFFFFF !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            max-width: 175px !important;
+            display: block !important;
+        }}
+
+        .ask-evidence-bottom {{
+            display: flex !important;
+            justify-content: flex-end !important;
+            align-items: center !important;
+            gap: 5px !important;
+            margin-top: 10px !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.8rem !important;
+            color: #8E8896 !important;
+        }}
+
+        .ask-evidence-arrow {{
+            color: {COLORS["coral"]} !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+        }}
+
+        /* Evidence Expander Styling */
+        [data-testid="stExpander"]:has(.ask-chunk-preview) {{
+            background: {COLORS["background"]} !important;
+            border: 1px solid #28222E !important;
+            border-radius: 8px !important;
+            margin-top: 8px !important;
+            margin-bottom: 8px !important;
+        }}
+
+        .ask-chunk-preview {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.78rem !important;
+            line-height: 1.5 !important;
+            color: #B8B1BA !important;
+            padding: 8px 12px !important;
+            white-space: pre-wrap !important;
+            word-break: break-word !important;
+            background: rgba(255, 255, 255, 0.02) !important;
+            border-radius: 6px !important;
+        }}
+
+        /* Empty / Guidance State */
+        .ask-empty-state {{
+            background: {COLORS["background"]} !important;
+            border: 1px dashed #28222E !important;
+            border-radius: 12px !important;
+            padding: 32px 24px !important;
+            text-align: center !important;
+            margin-top: 1rem !important;
+            margin-bottom: 1.5rem !important;
+            width: 100% !important;
+        }}
+
+        .ask-empty-title {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.95rem !important;
+            font-weight: 600 !important;
+            color: #FFFFFF !important;
+            margin-bottom: 6px !important;
+        }}
+
+        .ask-empty-desc {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.82rem !important;
+            color: #77717B !important;
+            margin-bottom: 16px !important;
+        }}
+
+        /* Suggestion Chips */
+        .ask-suggestions-row {{
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            flex-wrap: wrap !important;
+            margin-top: 6px !important;
+            margin-bottom: 1.25rem !important;
+        }}
+
+        .ask-suggestion-label {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.74rem !important;
+            color: #77717B !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.08em !important;
+        }}
+
+        /* Bottom Disclaimer / Footer */
+        .ask-footer-disclaimer {{
+            border-top: 1px solid #28222E !important;
+            margin-top: 2rem !important;
+            padding-top: 1.2rem !important;
+            margin-bottom: 1.5rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.76rem !important;
+            color: #77717B !important;
+            line-height: 1.4 !important;
+            width: 100% !important;
+        }}
+
+        .ask-shield-icon {{
+            width: 15px !important;
+            height: 15px !important;
+            flex-shrink: 0 !important;
+            display: inline-block !important;
+            background-color: #77717B !important;
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+        }}
+
+        /* =========================================================
            STREAMLIT CHROME
            ========================================================= */
 
