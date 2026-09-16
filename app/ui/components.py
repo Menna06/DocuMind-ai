@@ -13,6 +13,7 @@ from app.ui.theme import (
     DOCUMENT_CARD,
     DOCUMENT_TILE,
     INPUTS,
+    TYPOGRAPHY,
 )
 
 
@@ -302,15 +303,12 @@ def render_question_input(
     return value
 
 
-def render_answer_display(
-    answer: str,
-    sources: list | None = None,
-) -> None:
+def render_answer_display(answer: str) -> None:
     """Render an AI-generated answer with an animated gradient border."""
 
     answer_config = INPUTS["answer"]
 
-    st.markdown(
+    st.html(
         f"""
         <style>
         @keyframes documind-answer-gradient {{
@@ -339,6 +337,9 @@ def render_answer_display(
             box-shadow:
                 0 0 12px rgba(137, 39, 221, 0.18),
                 0 0 24px rgba(255, 45, 85, 0.08);
+            margin-bottom: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
         }}
 
         .documind-answer-content {{
@@ -346,7 +347,7 @@ def render_answer_display(
             border-radius: calc({INPUTS["radius"]} - 1px);
             padding: 24px;
             color: {COLORS["text_primary"]};
-            font-family: "JetBrains Mono", monospace;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace;
             line-height: 1.7;
         }}
 
@@ -356,7 +357,7 @@ def render_answer_display(
             gap: 8px;
             margin-bottom: 16px;
             color: {COLORS["text_primary"]};
-            font-family: "JetBrains Mono", monospace;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace;
             font-size: 0.75rem;
             font-weight: 700;
             letter-spacing: 0.08em;
@@ -373,44 +374,60 @@ def render_answer_display(
 
         .documind-answer-text {{
             color: {COLORS["text_primary"]};
-            font-family: "JetBrains Mono", monospace;
-            font-size: 0.95rem;
-            line-height: 1.75;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace;
+            font-size: 0.88rem;
+            line-height: 1.68;
+        }}
+
+        .documind-answer-text p {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace;
+            font-size: 0.88rem;
+            line-height: 1.68;
+            color: #E4E1E6;
+            margin-bottom: 12px;
+        }}
+
+        .documind-answer-text p:last-child {{
+            margin-bottom: 0;
+        }}
+
+        .documind-answer-text ul {{
+            margin-top: 8px;
+            margin-bottom: 12px;
+            padding-left: 22px;
+        }}
+
+        .documind-answer-text li {{
+            margin-bottom: 6px;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            color: #E4E1E6;
+        }}
+
+        .documind-answer-text li::marker {{
+            color: {COLORS["purple"]};
+            font-size: 1.1em;
         }}
         </style>
-
-        <div class="documind-answer-wrapper">
-            <div class="documind-answer-content">
-                <div class="documind-answer-label">
-                    <span>Answer</span>
-                    <span class="documind-answer-dot"></span>
-                </div>
-                <div class="documind-answer-text">
-                    {answer}
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
-    if sources:
-        st.markdown(
-            f"""
-            <div style="
-                margin-top: 16px;
-                font-family: 'JetBrains Mono', monospace;
-                font-size: 0.75rem;
-                color: {COLORS["text_muted"]};
-            ">
-                Sources
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    markup = (
+        '<div class="documind-answer-wrapper">\n'
+        '<div class="documind-answer-content">\n'
+        '<div class="documind-answer-label">\n'
+        '<span>Answer</span>\n'
+        '<span class="documind-answer-dot"></span>\n'
+        '</div>\n'
+        '<div class="documind-answer-text">\n\n'
+        f'{answer.strip()}\n\n'
+        '</div>\n'
+        '</div>\n'
+        '</div>'
+    )
 
-        for index, source in enumerate(sources, start=1):
-            st.caption(f"{index}. {source}")
+    st.markdown(markup, unsafe_allow_html=True)
 
 
 def render_document_dropzone(
