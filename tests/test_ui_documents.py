@@ -762,24 +762,36 @@ class TestStreamlitAppTestIntegration:
 
     def test_app_search_filter_and_clear_flow(self) -> None:
         """Typing a non-existent search query shows 'Clear search', which clears when clicked."""
-        at = AppTest.from_file(MAIN_SCRIPT_PATH, default_timeout=25)
-        at.run()
-        assert not at.exception
+        upload_dir = Path("data/uploads")
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        test_pdf = upload_dir / "_test_doc_filter.pdf"
+        created = False
+        if not any(upload_dir.glob("*.pdf")):
+            test_pdf.write_bytes(b"%PDF-1.4 test sample")
+            created = True
 
-        # Input non-matching search term
-        search_box = at.text_input(key="doc_search_query")
-        search_box.input("definitely_nonexistent_xyz").run()
-        assert not at.exception
+        try:
+            at = AppTest.from_file(MAIN_SCRIPT_PATH, default_timeout=25)
+            at.run()
+            assert not at.exception
 
-        # Clear search button must appear in empty filter state
-        clear_buttons = [b for b in at.button if b.key == "clear_search_btn"]
-        assert len(clear_buttons) == 1
+            # Input non-matching search term
+            search_box = at.text_input(key="doc_search_query")
+            search_box.input("definitely_nonexistent_xyz").run()
+            assert not at.exception
 
-        # Click clear search
-        clear_buttons[0].click().run()
-        assert not at.exception
-        # Verified that doc_search_query was cleared back to empty string
-        assert at.text_input(key="doc_search_query").value == ""
+            # Clear search button must appear in empty filter state
+            clear_buttons = [b for b in at.button if b.key == "clear_search_btn"]
+            assert len(clear_buttons) == 1
+
+            # Click clear search
+            clear_buttons[0].click().run()
+            assert not at.exception
+            # Verified that doc_search_query was cleared back to empty string
+            assert at.text_input(key="doc_search_query").value == ""
+        finally:
+            if created and test_pdf.exists():
+                test_pdf.unlink()
 
 
 # =========================================================================

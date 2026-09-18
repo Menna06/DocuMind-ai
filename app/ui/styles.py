@@ -68,6 +68,7 @@ def apply_global_styles() -> None:
         div[data-testid="stAlert"] {{
             background-color: {COLORS["background"]} !important;
             border: 1px solid #28222E !important;
+            border-radius: 12px !important;
         }}
 
         .main .block-container,
@@ -1056,8 +1057,11 @@ div[data-testid="stSidebarUserContent"],
            ALERTS
            ========================================================= */
 
-        [data-testid="stAlert"] {{
-            border-radius: {RADIUS["sm"]};
+        div[data-testid="stAlert"],
+        [data-testid="stAlert"],
+        [data-testid="stAlert"] > div,
+        .stAlert {{
+            border-radius: 12px !important;
         }}
 
 
@@ -2266,6 +2270,797 @@ div[data-testid="stSidebarUserContent"],
             background-color: #77717B !important;
             -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E") center / contain no-repeat !important;
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+        }}
+
+        /* =========================================================
+           TICKET 11: UPLOAD PAGE REDESIGN
+           ========================================================= */
+
+        .upload-top-bar {{
+            display: flex !important;
+            justify-content: flex-end !important;
+            align-items: center !important;
+            margin-top: -3.6rem !important;
+            margin-bottom: 0.4rem !important;
+            width: 100% !important;
+        }}
+
+        .upload-status-pill {{
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            border: 1px solid #28222E !important;
+            background: #0D0B10 !important;
+            border-radius: 9999px !important;
+            padding: 6px 14px !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.72rem !important;
+            color: #77717B !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            user-select: none !important;
+        }}
+
+        .upload-status-dot {{
+            width: 7px !important;
+            height: 7px !important;
+            border-radius: 50% !important;
+            background-color: #79B58A !important;
+            box-shadow: 0 0 8px rgba(121, 181, 138, 0.6) !important;
+            display: inline-block !important;
+        }}
+
+        /* Upload Header */
+        .upload-header {{
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 5px !important;
+            margin-top: -0.8rem !important;
+            margin-bottom: 2.25rem !important;
+        }}
+
+        .upload-title {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 2.25rem !important;
+            font-weight: 600 !important;
+            color: #FFFFFF !important;
+            letter-spacing: -0.03em !important;
+            margin: 0 0 0.35rem 0 !important;
+            line-height: 1.2 !important;
+        }}
+
+        .upload-subtitle {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.85rem !important;
+            color: #8E8896 !important;
+            margin: 0 !important;
+            line-height: 1.5 !important;
+        }}
+
+        /* Dropzone Wrapper & Overrides */
+        .st-key-upload_dropzone_wrapper {{
+            margin-bottom: 2rem !important;
+            width: 100% !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploader"] {{
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] {{
+            background: rgba(137, 39, 221, 0.02) !important;
+            border: 1.5px dashed rgba(137, 39, 221, 0.45) !important;
+            border-radius: 16px !important;
+            padding: 2.75rem 1.5rem !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 12px !important;
+            text-align: center !important;
+            transition: all 0.2s ease-in-out !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"]:hover {{
+            border-color: #A855F7 !important;
+            background: rgba(137, 39, 221, 0.05) !important;
+            box-shadow: 0 0 20px rgba(137, 39, 221, 0.15) !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] > span {{
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            margin: 0 auto !important;
+            width: auto !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] > div {{
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            text-align: center !important;
+            margin: 0 auto !important;
+            gap: 12px !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] svg {{
+            color: #A855F7 !important;
+            stroke: #A855F7 !important;
+            width: 18px !important;
+            height: 18px !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzoneInstructions"] {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            text-align: center !important;
+            margin: 0 auto !important;
+            flex: 0 0 auto !important;
+            width: auto !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzoneInstructions"] > div,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzoneInstructions"] > span,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzoneInstructions"] span {{
+            text-align: center !important;
+            justify-content: center !important;
+            align-items: center !important;
+            color: #77717B !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.78rem !important;
+            margin: 0 auto !important;
+        }}
+
+        /* Main dropzone browse button (empty state) */
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] > span > button,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] button[data-testid="stBaseButton-secondary"] {{
+            background: #1C1824 !important;
+            border: 1px solid rgba(137, 39, 221, 0.4) !important;
+            color: #C084FC !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            border-radius: 8px !important;
+            font-size: 0.85rem !important;
+            font-weight: 500 !important;
+            padding: 8px 24px !important;
+            margin: 0 auto !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            transition: all 0.2s ease !important;
+            box-shadow: none !important;
+            width: auto !important;
+            height: auto !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] > span > button:hover,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] button[data-testid="stBaseButton-secondary"]:hover {{
+            background: #8927DD !important;
+            color: #FFFFFF !important;
+            border-color: #8927DD !important;
+            box-shadow: 0 0 12px rgba(137, 39, 221, 0.4) !important;
+        }}
+
+        /* Uploaded File Chips Styling (UI-11 Polished State) */
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChips"] {{
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 12px !important;
+            flex-wrap: wrap !important;
+            width: auto !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChip"],
+        .st-key-upload_dropzone_wrapper .stFileChip {{
+            background: #120F16 !important;
+            border: 1px solid #28222E !important;
+            border-radius: 12px !important;
+            padding: 8px 14px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChip"]:hover,
+        .st-key-upload_dropzone_wrapper .stFileChip:hover {{
+            border-color: rgba(137, 39, 221, 0.5) !important;
+            box-shadow: 0 0 12px rgba(137, 39, 221, 0.2) !important;
+        }}
+
+        /* File Chip Icon (replaces harsh white square with DocuMind purple badge) */
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChip"] > div:first-child,
+        .st-key-upload_dropzone_wrapper .stFileChip > div:first-child,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChip"] [class*="e1dmul8p5"],
+        .st-key-upload_dropzone_wrapper .stFileChip [class*="e1dmul8p5"] {{
+            background: rgba(137, 39, 221, 0.15) !important;
+            background-color: rgba(137, 39, 221, 0.15) !important;
+            border: 1px solid rgba(137, 39, 221, 0.4) !important;
+            border-radius: 8px !important;
+            color: #C084FC !important;
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+            min-height: 34px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChip"] > div:first-child svg,
+        .st-key-upload_dropzone_wrapper .stFileChip > div:first-child svg,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChip"] [class*="e1dmul8p5"] svg,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChip"] > div:first-child *,
+        .st-key-upload_dropzone_wrapper .stFileChip > div:first-child * {{
+            color: #C084FC !important;
+            fill: currentColor !important;
+            width: 18px !important;
+            height: 18px !important;
+        }}
+
+        /* File Chip Text & Metadata */
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChip"] [data-testid="stFileChipName"],
+        .st-key-upload_dropzone_wrapper .stFileChip [data-testid="stFileChipName"] {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            color: #F5F2F6 !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChip"] small,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChip"] [class*="e1dmul8p8"] {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.72rem !important;
+            color: #8E8896 !important;
+        }}
+
+        /* Delete / Remove Button (replaces clunky box with sleek minimal circular icon button) */
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChipDeleteBtn"],
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChipDeleteBtn"] button {{
+            width: 24px !important;
+            height: 24px !important;
+            min-width: 24px !important;
+            min-height: 24px !important;
+            max-width: 24px !important;
+            max-height: 24px !important;
+            padding: 0 !important;
+            margin: 0 0 0 6px !important;
+            border-radius: 50% !important;
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+            color: #77717B !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            line-height: 1 !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChipDeleteBtn"] button:hover {{
+            background: rgba(249, 109, 87, 0.15) !important;
+            color: #F96D57 !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChipDeleteBtn"] button *,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChipDeleteBtn"] * {{
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChipDeleteBtn"] svg {{
+            width: 18px !important;
+            height: 18px !important;
+            color: inherit !important;
+            fill: currentColor !important;
+            stroke: none !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChipDeleteBtn"] svg path {{
+            stroke: none !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChipDeleteBtn"] svg path[fill="none"] {{
+            display: none !important;
+            stroke: none !important;
+            fill: none !important;
+        }}
+
+        /* Add File (+) Button */
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChips"] ~ button,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] button[aria-label="Add files"],
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] button[data-testid="stBaseButton-borderlessIcon"] {{
+            width: 28px !important;
+            height: 28px !important;
+            min-width: 28px !important;
+            min-height: 28px !important;
+            max-width: 28px !important;
+            max-height: 28px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border-radius: 50% !important;
+            border: 1px solid rgba(137, 39, 221, 0.35) !important;
+            background: rgba(137, 39, 221, 0.08) !important;
+            color: #C084FC !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: none !important;
+            outline: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChips"] ~ button:hover,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] button[aria-label="Add files"]:hover,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] button[data-testid="stBaseButton-borderlessIcon"]:hover {{
+            background: #8927DD !important;
+            color: #FFFFFF !important;
+            border-color: #8927DD !important;
+            box-shadow: 0 0 10px rgba(137, 39, 221, 0.4) !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChips"] ~ button svg,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] button[aria-label="Add files"] svg,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] button[data-testid="stBaseButton-borderlessIcon"] svg {{
+            width: 16px !important;
+            height: 16px !important;
+            color: inherit !important;
+            fill: currentColor !important;
+            stroke: none !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChips"] ~ button svg path,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] button[aria-label="Add files"] svg path,
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] button[data-testid="stBaseButton-borderlessIcon"] svg path {{
+            stroke: none !important;
+        }}
+
+        .st-key-upload_dropzone_wrapper [data-testid="stFileChips"] ~ button svg path[fill="none"],
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] button[aria-label="Add files"] svg path[fill="none"],
+        .st-key-upload_dropzone_wrapper [data-testid="stFileUploaderDropzone"] button[data-testid="stBaseButton-borderlessIcon"] svg path[fill="none"] {{
+            display: none !important;
+            stroke: none !important;
+            fill: none !important;
+        }}
+
+        /* Section Titles */
+        .upload-section-row {{
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 0.85rem !important;
+        }}
+
+        .upload-section-title {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.78rem !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.06em !important;
+            color: #B8B1BA !important;
+            text-transform: uppercase !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+        }}
+
+        .upload-section-count {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.75rem !important;
+            color: #77717B !important;
+        }}
+
+        .upload-stepper-dot {{
+            width: 7px !important;
+            height: 7px !important;
+            border-radius: 50% !important;
+            background-color: #A855F7 !important;
+            box-shadow: 0 0 8px rgba(168, 85, 247, 0.7) !important;
+            display: inline-block !important;
+        }}
+
+        /* Recent Uploads Cards */
+        .upload-recent-card,
+        [class*="st-key-upload_card_container_"] {{
+            background: #0D0B10 !important;
+            border: 1px solid #28222E !important;
+            border-radius: 12px !important;
+            padding: 12px 18px !important;
+            margin-bottom: 0.75rem !important;
+            transition: border-color 0.15s ease !important;
+        }}
+
+        .upload-recent-card:hover,
+        [class*="st-key-upload_card_container_"]:hover {{
+            border-color: rgba(137, 39, 221, 0.4) !important;
+        }}
+
+        [class*="st-key-upload_card_container_"] [data-testid="stColumn"] {{
+            display: flex !important;
+            align-items: center !important;
+        }}
+
+        [class*="st-key-upload_card_container_"] button {{
+            background: transparent !important;
+            border: 1px solid transparent !important;
+            color: #77717B !important;
+            font-size: 1.1rem !important;
+            padding: 4px 8px !important;
+            border-radius: 6px !important;
+            transition: all 0.2s ease !important;
+            line-height: 1 !important;
+        }}
+
+        [class*="st-key-upload_card_container_"] button:hover {{
+            background: rgba(249, 109, 87, 0.12) !important;
+            border-color: rgba(249, 109, 87, 0.3) !important;
+            color: #F96D57 !important;
+        }}
+
+        .upload-pdf-badge {{
+            width: 38px !important;
+            height: 38px !important;
+            flex-shrink: 0 !important;
+            background: rgba(137, 39, 221, 0.15) !important;
+            border: 1px solid rgba(137, 39, 221, 0.35) !important;
+            border-radius: 8px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }}
+
+        .upload-pdf-icon-img {{
+            width: 24px !important;
+            height: 24px !important;
+            object-fit: contain !important;
+        }}
+
+        .upload-doc-info {{
+            flex: 1 !important;
+            min-width: 0 !important;
+        }}
+
+        .upload-doc-title {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.90rem !important;
+            font-weight: 600 !important;
+            color: #F5F2F6 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            margin-bottom: 3px !important;
+        }}
+
+        .upload-doc-meta {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.75rem !important;
+            color: #77717B !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+        }}
+
+        .upload-status-ready {{
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            background: rgba(121, 181, 138, 0.1) !important;
+            border: 1px solid rgba(121, 181, 138, 0.3) !important;
+            border-radius: 9999px !important;
+            padding: 1px 7px !important;
+            font-size: 0.70rem !important;
+            color: #79B58A !important;
+            font-weight: 500 !important;
+        }}
+
+        .upload-status-processing {{
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            background: rgba(168, 85, 247, 0.12) !important;
+            border: 1px solid rgba(168, 85, 247, 0.35) !important;
+            border-radius: 9999px !important;
+            padding: 1px 7px !important;
+            font-size: 0.70rem !important;
+            color: #C084FC !important;
+            font-weight: 500 !important;
+        }}
+
+        /* Delete Button in Recent Uploads */
+        .st-key-upload_del_btn button {{
+            background: transparent !important;
+            border: 1px solid transparent !important;
+            color: #77717B !important;
+            font-size: 1.1rem !important;
+            padding: 6px !important;
+            border-radius: 6px !important;
+            transition: all 0.2s ease !important;
+            line-height: 1 !important;
+        }}
+
+        .st-key-upload_del_btn button:hover {{
+            background: rgba(249, 109, 87, 0.12) !important;
+            border-color: rgba(249, 109, 87, 0.3) !important;
+            color: #F96D57 !important;
+        }}
+
+        /* Ingestion Stepper Container */
+        .upload-stepper-card {{
+            background: #0D0B10 !important;
+            border: 1px solid #28222E !important;
+            border-radius: 14px !important;
+            padding: 28px 24px !important;
+            margin-bottom: 1.5rem !important;
+        }}
+
+        .upload-stepper-track {{
+            position: relative !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: flex-start !important;
+            width: 100% !important;
+        }}
+
+        .upload-stepper-line-bg {{
+            position: absolute !important;
+            top: 24px !important;
+            left: 10% !important;
+            right: 10% !important;
+            height: 2px !important;
+            background: #28222E !important;
+            z-index: 1 !important;
+        }}
+
+        .upload-stepper-line-fill {{
+            position: absolute !important;
+            top: 24px !important;
+            left: 10% !important;
+            height: 2px !important;
+            background: linear-gradient(90deg, #8927DD, #A855F7) !important;
+            box-shadow: 0 0 8px rgba(168, 85, 247, 0.5) !important;
+            z-index: 2 !important;
+            transition: width 0.3s ease !important;
+        }}
+
+        .upload-step-item {{
+            position: relative !important;
+            z-index: 3 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+            width: 18% !important;
+        }}
+
+        .upload-step-circle {{
+            width: 48px !important;
+            height: 48px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin-bottom: 12px !important;
+            transition: all 0.25s ease !important;
+        }}
+
+        .upload-step-circle.completed {{
+            background: #1B1226 !important;
+            border: 2px solid #8927DD !important;
+            color: #C084FC !important;
+            box-shadow: 0 0 14px rgba(137, 39, 221, 0.45) !important;
+        }}
+
+        .upload-step-circle.progress {{
+            background: #2A1640 !important;
+            border: 2px solid #C084FC !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 0 18px rgba(192, 132, 252, 0.6) !important;
+            animation: upload-pulse 2s infinite !important;
+        }}
+
+        .upload-step-circle.pending {{
+            background: #120F16 !important;
+            border: 1.5px solid #28222E !important;
+            color: #4D4850 !important;
+        }}
+
+        @keyframes upload-pulse {{
+            0% {{
+                box-shadow: 0 0 0 0 rgba(192, 132, 252, 0.6);
+            }}
+            70% {{
+                box-shadow: 0 0 0 10px rgba(192, 132, 252, 0);
+            }}
+            100% {{
+                box-shadow: 0 0 0 0 rgba(192, 132, 252, 0);
+            }}
+        }}
+
+        .upload-step-name {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.82rem !important;
+            font-weight: 600 !important;
+            margin-bottom: 4px !important;
+        }}
+
+        .upload-step-name.active {{
+            color: #F5F2F6 !important;
+        }}
+
+        .upload-step-name.muted {{
+            color: #5E5764 !important;
+        }}
+
+        .upload-step-desc {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.70rem !important;
+            margin-bottom: 10px !important;
+            line-height: 1.3 !important;
+        }}
+
+        .upload-step-desc.active {{
+            color: #8E8896 !important;
+        }}
+
+        .upload-step-desc.muted {{
+            color: #403B46 !important;
+        }}
+
+        .upload-step-pill {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.68rem !important;
+            padding: 3px 10px !important;
+            border-radius: 9999px !important;
+            display: inline-block !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.02em !important;
+        }}
+
+        .upload-step-pill.completed {{
+            background: rgba(137, 39, 221, 0.15) !important;
+            border: 1px solid rgba(137, 39, 221, 0.35) !important;
+            color: #C084FC !important;
+        }}
+
+        .upload-step-pill.progress {{
+            background: rgba(168, 85, 247, 0.2) !important;
+            border: 1px solid rgba(168, 85, 247, 0.6) !important;
+            color: #FFFFFF !important;
+        }}
+
+        .upload-step-pill.pending {{
+            background: #151218 !important;
+            border: 1px solid #28222E !important;
+            color: #5E5764 !important;
+        }}
+
+        /* Bottom Security Callout */
+        .upload-security-callout {{
+            background: rgba(249, 109, 87, 0.03) !important;
+            border: 1px solid rgba(249, 109, 87, 0.25) !important;
+            border-radius: 12px !important;
+            padding: 14px 18px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 14px !important;
+            margin-bottom: 2rem !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }}
+
+        .upload-security-icon-img {{
+            width: 22px !important;
+            height: 26px !important;
+            object-fit: contain !important;
+            flex-shrink: 0 !important;
+            display: block !important;
+        }}
+
+        .upload-shield-svg {{
+            flex-shrink: 0 !important;
+        }}
+
+        .upload-security-icon {{
+            font-size: 1.15rem !important;
+            flex-shrink: 0 !important;
+            line-height: 1 !important;
+        }}
+
+        .upload-security-text {{
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.78rem !important;
+            color: #B8B1BA !important;
+            line-height: 1.5 !important;
+        }}
+
+        /* =========================================================
+           UPLOAD SUCCESS TOAST (Auto-dismiss after 3s, smooth corners)
+           ========================================================= */
+        @keyframes upload-toast-dismiss {{
+            0% {{
+                opacity: 0;
+                transform: translateY(-6px);
+                max-height: 80px;
+                margin-bottom: 1.25rem;
+            }}
+            8% {{
+                opacity: 1;
+                transform: translateY(0);
+                max-height: 80px;
+                margin-bottom: 1.25rem;
+            }}
+            82% {{
+                opacity: 1;
+                transform: translateY(0);
+                max-height: 80px;
+                margin-bottom: 1.25rem;
+                padding-top: inherit;
+                padding-bottom: inherit;
+            }}
+            96% {{
+                opacity: 0;
+                transform: translateY(-8px);
+                max-height: 0;
+                margin-bottom: 0;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                border-color: transparent !important;
+                overflow: hidden !important;
+            }}
+            100% {{
+                opacity: 0;
+                transform: translateY(-8px);
+                max-height: 0;
+                margin-bottom: 0;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                border: none !important;
+                overflow: hidden !important;
+                display: none !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+            }}
+        }}
+
+        .st-key-upload_success_toast {{
+            animation: upload-toast-dismiss 3.6s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+            overflow: hidden !important;
+            margin-bottom: 0 !important;
+        }}
+
+        .st-key-upload_success_toast [data-testid="stAlert"],
+        .st-key-upload_success_toast [data-testid="stAlert"] > div,
+        .st-key-upload_success_toast .stAlert {{
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            background: rgba(121, 181, 138, 0.08) !important;
+            border: 1px solid rgba(121, 181, 138, 0.35) !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 12px rgba(121, 181, 138, 0.12) !important;
+        }}
+
+        .st-key-upload_success_toast [data-testid="stAlert"] * {{
+            color: #79B58A !important;
+            font-family: "{TYPOGRAPHY["font_family"]}", monospace !important;
+            font-size: 0.82rem !important;
+            font-weight: 500 !important;
         }}
 
         /* =========================================================
