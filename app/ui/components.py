@@ -558,9 +558,9 @@ def render_document_card(
     remain inside one Streamlit container.
     """
 
-    if status not in {"ready", "processing"}:
+    if status not in {"ready", "processing", "failed"}:
         raise ValueError(
-            "Document status must be 'ready' or 'processing'."
+            "Document status must be 'ready', 'processing', or 'failed'."
         )
 
     safe_key = _safe_key(
@@ -597,7 +597,17 @@ def render_document_card(
 
             </div>
         """
+    elif status == "failed":
+        status_html = """
+            <div class="document-card-status">
 
+                <span class="document-status-badge document-status-failed">
+                    <span class="document-failed-dot"></span>
+                    Indexing Failed
+                </span>
+
+            </div>
+        """
     else:
         status_html = """
             <div class="document-card-status">
@@ -807,6 +817,28 @@ def render_document_card(
                 document-processing-pulse
                 1.4s ease-in-out
                 infinite;
+        }}
+
+        .st-key-{safe_key} .document-status-failed {{
+            color: {COLORS["error"]};
+
+            background: rgba(249, 109, 87, 0.08);
+
+            border: 1px solid rgba(249, 109, 87, 0.32);
+        }}
+
+        .st-key-{safe_key} .document-failed-dot {{
+            width: 7px;
+            height: 7px;
+
+            flex: 0 0 7px;
+
+            border-radius: 50%;
+
+            background: {COLORS["error"]};
+
+            box-shadow:
+                0 0 6px rgba(249, 109, 87, 0.5);
         }}
 
         @keyframes document-processing-pulse {{

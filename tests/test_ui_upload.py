@@ -149,6 +149,7 @@ class TestUploadDropzone:
         _, kwargs = file_uploader_mock.call_args
         assert kwargs.get("type") == ["pdf"]
         assert kwargs.get("key") == "upload_pdf_file"
+        assert kwargs.get("accept_multiple_files") is True
         assert kwargs.get("label_visibility") == "collapsed"
         assert "upload_dropzone_wrapper" in container_keys
 
@@ -602,3 +603,145 @@ class TestUploadAppTest:
                 radio.select("Upload").run()
                 assert not at.exception
                 assert len(at.file_uploader) > 0
+
+
+# =========================================================================
+# 9. Multi-File Upload & Error Recovery Tests
+# =========================================================================
+
+class TestMultiFileUploadAndErrorRecovery:
+    """Verify batch upload of multiple PDFs, partial failure handling, and failed status."""
+
+    def test_multi_file_upload_all_succeed(self, monkeypatch) -> None:
+        saved_files: list[str] = []
+        ingested_files: list[str] = []
+        rerun_mock = MagicMock()
+        success_mock = MagicMock()
+
+        f1 = MagicMock()
+        f1.name = "doc1.pdf"
+        f2 = MagicMock()
+        f2.name = "doc2.pdf"
+        f3 = MagicMock()
+        f3.name = "doc3.pdf"
+
+        monkeypatch.setattr(upload_module.DocumentService, "is_valid_pdf", lambda self, f: True)
+        monkeypatch.setattr(upload_module.DocumentService, "save_document", lambda self, f: saved_files.append(f.name))
+        monkeypatch.setattr(
+            upload_module.DocumentIngestionService,
+            "ingest_document",
+            lambda self, fn: (ingested_files.append(fn), IngestionResult(fn, 2, 6, ["id1"]))[1],
+        )
+        monkeypatch.setattr(upload_module.DocumentService, "list_documents", lambda self: [])
+        monkeypatch.setattr(upload_module.st, "file_uploader", MagicMock(return_value=[f1, f2, f3]))
+        session_state = MockSessionState()
+        monkeypatch.setattr(upload_module.st, "session_state", session_state)
+        monkeypatch.setattr(upload_module.st, "html", MagicMock())
+        monkeypatch.setattr(upload_module.st, "container", lambda **kwargs: DummyContextManager())
+        monkeypatch.setattr(upload_module.st, "empty", lambda: MagicMock())
+        monkeypatch.setattr(upload_module.st, "rerun", rerun_mock)
+        monkeypatch.setattr(upload_module.st, "success", success_mock)
+
+        render_upload_page()
+
+        assert saved_files == ["doc1.pdf", "doc2.pdf", "doc3.pdf"]
+        assert ingested_files == ["doc1.pdf", "doc2.pdf", "doc3.pdf"]
+        assert session_state.get("_uploader_nonce") == 1
+        assert "3 documents uploaded and indexed successfully" in session_state.get("_upload_success_message", "")
+        rerun_mock.assert_called_once()
+
+    def test_multi_file_upload_partial_failure_recovers_gracefully(self, monkeypatch) -> None:
+        saved_files: list[str] = []
+        rerun_mock = MagicMock()
+        error_mock = MagicMock()
+
+        f1 = MagicMock()
+        f1.name = "good1.pdf"
+        f2 = MagicMock()
+        f2.name = "bad.pdf"
+        f3 = MagicMock()
+        f3.name = "good2.pdf"
+
+        def fake_ingest(self, fn: str):
+            if fn == "bad.pdf":
+                raise RuntimeError("Network failure")
+            return IngestionResult(fn, 1, 2, ["id"])
+
+        monkeypatch.setattr(upload_module.DocumentService, "is_valid_pdf", lambda self, f: True)
+        monkeypatch.setattr(upload_module.DocumentService, "save_document", lambda self, f: saved_files.append(f.name))
+        monkeypatch.setattr(upload_module.DocumentIngestionService, "ingest_document", fake_ingest)
+        monkeypatch.setattr(upload_module.DocumentService, "list_documents", lambda self: [])
+        monkeypatch.setattr(upload_module.st, "file_uploader", MagicMock(return_value=[f1, f2, f3]))
+        session_state = MockSessionState()
+        monkeypatch.setattr(upload_module.st, "session_state", session_state)
+        monkeypatch.setattr(upload_module.st, "html", MagicMock())
+        monkeypatch.setattr(upload_module.st, "container", lambda **kwargs: DummyContextManager())
+        monkeypatch.setattr(upload_module.st, "empty", lambda: MagicMock())
+        monkeypatch.setattr(upload_module.st, "rerun", rerun_mock)
+        monkeypatch.setattr(upload_module.st, "error", error_mock)
+
+        render_upload_page()
+
+        assert "bad.pdf" in session_state.get("_failed_files", set())
+        assert session_state.get("_uploader_nonce") == 1
+        assert "2 documents indexed successfully, but 1 failed" in session_state.get("_upload_success_message", "")
+        rerun_mock.assert_called_once()
+
+    def test_failed_document_card_renders_failed_status(self, monkeypatch) -> None:
+        card_calls: list[dict] = []
+
+        def fake_render_card(**kwargs):
+            card_calls.append(kwargs)
+            return {}
+
+        monkeypatch.setattr(upload_module, "render_document_card", fake_render_card)
+        monkeypatch.setattr(upload_module.st, "html", MagicMock())
+        session_state = MockSessionState()
+        session_state["_failed_files"] = {"corrupt.pdf"}
+        monkeypatch.setattr(upload_module.st, "session_state", session_state)
+        monkeypatch.setattr(upload_module.st, "file_uploader", MagicMock(return_value=None))
+        monkeypatch.setattr(upload_module.st, "container", lambda **kwargs: DummyContextManager())
+        monkeypatch.setattr(
+            upload_module.DocumentService,
+            "list_documents",
+            lambda self: [_make_dummy_doc("corrupt.pdf")],
+        )
+
+        render_upload_page()
+
+        assert len(card_calls) == 1
+        assert card_calls[0]["filename"] == "corrupt.pdf"
+        assert card_calls[0]["status"] == "failed"
+
+    def test_delete_action_cleans_up_failed_file(self, monkeypatch) -> None:
+        delete_mock = MagicMock()
+        rerun_mock = MagicMock()
+
+        monkeypatch.setattr(upload_module.DocumentService, "delete_document", delete_mock)
+        monkeypatch.setattr(upload_module.st, "rerun", rerun_mock)
+        monkeypatch.setattr(upload_module.st, "success", MagicMock())
+        monkeypatch.setattr(upload_module.st, "html", MagicMock())
+        session_state = MockSessionState(_failed_files={"broken.pdf"})
+        session_state["confirm_delete_broken.pdf"] = True
+        monkeypatch.setattr(upload_module.st, "session_state", session_state)
+        monkeypatch.setattr(upload_module.st, "file_uploader", MagicMock(return_value=None))
+        monkeypatch.setattr(upload_module.st, "container", lambda **kwargs: DummyContextManager())
+        monkeypatch.setattr(upload_module.st, "columns", mock_columns)
+        monkeypatch.setattr(
+            upload_module.DocumentService,
+            "list_documents",
+            lambda self: [_make_dummy_doc("broken.pdf")],
+        )
+        monkeypatch.setattr(upload_module, "render_document_card", lambda **kwargs: {})
+        monkeypatch.setattr(
+            upload_module,
+            "render_button",
+            lambda label, **kwargs: label == "Confirm Delete",
+        )
+
+        render_upload_page()
+
+        delete_mock.assert_called_once_with("broken.pdf")
+        assert "broken.pdf" not in session_state["_failed_files"]
+        rerun_mock.assert_called_once()
+

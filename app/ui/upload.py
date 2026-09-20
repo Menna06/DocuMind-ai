@@ -173,55 +173,82 @@ def render_upload_page() -> None:
     uploader_nonce = st.session_state.get("_uploader_nonce", 0)
     uploader_key = f"upload_pdf_file_{uploader_nonce}" if uploader_nonce else "upload_pdf_file"
     with st.container(key="upload_dropzone_wrapper"):
-        uploaded_file = st.file_uploader(
+        raw_uploaded_files = st.file_uploader(
             "Upload PDF",
             type=["pdf"],
             key=uploader_key,
+            accept_multiple_files=True,
             label_visibility="collapsed",
         )
 
-    # Success message banner (displayed on rerun after upload completion)
+    # Success/Error message banner (displayed on rerun after upload completion)
     if "_upload_success_message" in st.session_state:
         with st.container(key="upload_success_toast"):
             st.success(st.session_state.pop("_upload_success_message"))
+    if "_upload_error_message" in st.session_state:
+        with st.container(key="upload_error_toast"):
+            st.error(st.session_state.pop("_upload_error_message"))
 
     # 4. Check for active upload / processing
     is_processing = False
-    processing_filename: str | None = None
+    valid_files_to_process: list = []
+    processing_filenames: set[str] = set()
 
-    if uploaded_file is not None:
+    # Track processed files and failed files in session_state
+    failed_files: set[str] = st.session_state.setdefault("_failed_files", set())
+    processed_files: set[str] = st.session_state.setdefault("_processed_files", set())
+
+    # Normalize to list (handles both list of UploadedFiles and single mock object)
+    if raw_uploaded_files is not None:
+        if isinstance(raw_uploaded_files, list):
+            uploaded_files = raw_uploaded_files
+        else:
+            uploaded_files = [raw_uploaded_files]
+    else:
+        uploaded_files = []
+
+    if uploaded_files:
         last_ingested = st.session_state.get("_last_ingested_file")
-        if last_ingested != uploaded_file.name:
-            if not document_service.is_valid_pdf(uploaded_file):
-                st.error(f"{uploaded_file.name}: only PDF files are supported.")
+        pending_files = [
+            f for f in uploaded_files
+            if f.name not in processed_files and (len(uploaded_files) > 1 or f.name != last_ingested)
+        ]
+
+        for f in pending_files:
+            if not document_service.is_valid_pdf(f):
+                st.error(f"{f.name}: only PDF files are supported.")
+                processed_files.add(f.name)
+                failed_files.add(f.name)
             else:
-                is_processing = True
-                processing_filename = uploaded_file.name
                 try:
-                    document_service.save_document(uploaded_file)
+                    document_service.save_document(f)
                     _get_pdf_page_count.clear()
+                    valid_files_to_process.append(f)
+                    processing_filenames.add(f.name)
                 except Exception as save_err:
-                    st.error(f"Failed to save document: {save_err}")
-                    is_processing = False
-                    processing_filename = None
+                    st.error(f"Failed to save {f.name}: {save_err}")
+                    processed_files.add(f.name)
+                    failed_files.add(f.name)
+
+        if valid_files_to_process:
+            is_processing = True
 
     # 5. Recent Uploads Section (reusing the exact render_document_card component)
     documents = document_service.list_documents()
-    if is_processing and processing_filename:
-        # Ensure processing document is in documents list and displayed first
-        if processing_filename not in [d.filename for d in documents]:
-            file_bytes = uploaded_file.getvalue() if hasattr(uploaded_file, "getvalue") else b""
-            size_kb = round(len(file_bytes) / 1024, 2) if file_bytes else 0.0
-            documents.insert(
-                0,
-                DocumentMetadata(
-                    filename=processing_filename,
-                    size_kb=size_kb,
-                    uploaded_at=datetime.now(),
-                ),
-            )
-        else:
-            documents.sort(key=lambda d: 0 if d.filename == processing_filename else 1)
+    if is_processing and processing_filenames:
+        for f in valid_files_to_process:
+            if f.name not in [d.filename for d in documents]:
+                file_bytes = f.getvalue() if hasattr(f, "getvalue") else b""
+                size_kb = round(len(file_bytes) / 1024, 2) if file_bytes else 0.0
+                documents.insert(
+                    0,
+                    DocumentMetadata(
+                        filename=f.name,
+                        size_kb=size_kb,
+                        uploaded_at=datetime.now(),
+                    ),
+                )
+        documents.sort(key=lambda d: 0 if d.filename in processing_filenames else 1)
 
     doc_count = len(documents)
     count_label = f"{doc_count} document{'s' if doc_count != 1 else ''} uploaded"
@@ -244,7 +271,12 @@ def render_upload_page() -> None:
                 if isinstance(doc.uploaded_at, datetime)
                 else str(doc.uploaded_at)
             )
-            card_status = "processing" if (is_processing and doc.filename == processing_filename) else "ready"
+            if is_processing and doc.filename in processing_filenames:
+                card_status = "processing"
+            elif doc.filename in failed_files:
+                card_status = "failed"
+            else:
+                card_status = "ready"
 
             actions = render_document_card(
                 filename=doc.filename,
@@ -263,6 +295,16 @@ def render_upload_page() -> None:
 
             if st.session_state.get(f"show_details_{doc.filename}", False):
                 with st.container():
+                    status_text = (
+                        "Indexing Failed"
+                        if card_status == "failed"
+                        else ("Processing..." if card_status == "processing" else "Indexed & Ready")
+                    )
+                    status_color = (
+                        "#F96D57"
+                        if card_status == "failed"
+                        else ("#8927DD" if card_status == "processing" else "#79B58A")
+                    )
                     st.html(
                         f"""
                         <div class="documents-info-drawer">
@@ -289,7 +331,7 @@ def render_upload_page() -> None:
                                 </div>
                                 <div class="documents-info-item">
                                     <span class="documents-info-label">Indexing Status</span>
-                                    <span class="documents-info-value" style="color: #79B58A;">Indexed &amp; Ready</span>
+                                    <span class="documents-info-value" style="color: {status_color};">{status_text}</span>
                                 </div>
                                 <div class="documents-info-item">
                                     <span class="documents-info-label">Storage Path</span>
@@ -383,6 +425,8 @@ def render_upload_page() -> None:
                                 st.session_state.pop(f"view_text_{doc.filename}", None)
                                 if st.session_state.get("_last_ingested_file") == doc.filename:
                                     st.session_state.pop("_last_ingested_file", None)
+                                failed_files.discard(doc.filename)
+                                processed_files.discard(doc.filename)
                                 _get_pdf_page_count.clear()
                                 st.success(f"{doc.filename} deleted.")
                                 st.rerun()
@@ -406,7 +450,7 @@ def render_upload_page() -> None:
         )
 
     # 6. Ingestion Progress Section (ONLY VISIBLE WHEN ACTIVELY PROCESSING)
-    if is_processing and processing_filename:
+    if is_processing and valid_files_to_process:
         st.html(
             """
             <div class="upload-section-row" style="margin-top: 1.5rem;">
@@ -417,39 +461,72 @@ def render_upload_page() -> None:
             """
         )
         stepper_placeholder = st.empty()
-        try:
-            # Phase 1: Upload (File received)
-            stepper_placeholder.html(render_stepper_html(active_phase=1, is_complete=False))
-            _stepper_sleep(0.35)
+        succeeded: list[tuple[str, int, int]] = []
+        failed: list[tuple[str, str]] = []
 
-            # Phase 2: Analysis (Reading document)
-            stepper_placeholder.html(render_stepper_html(active_phase=2, is_complete=False))
-            _stepper_sleep(0.4)
+        total_files = len(valid_files_to_process)
+        for idx, f in enumerate(valid_files_to_process, start=1):
+            fn = f.name
+            if total_files > 1:
+                st.caption(f"Processing file {idx} of {total_files}: {fn}")
+            try:
+                # Phase 1: Upload (File received)
+                stepper_placeholder.html(render_stepper_html(active_phase=1, is_complete=False))
+                _stepper_sleep(0.35)
 
-            # Phase 3: Structuring (Organizing content)
-            stepper_placeholder.html(render_stepper_html(active_phase=3, is_complete=False))
-            _stepper_sleep(0.4)
+                # Phase 2: Analysis (Reading document)
+                stepper_placeholder.html(render_stepper_html(active_phase=2, is_complete=False))
+                _stepper_sleep(0.4)
 
-            # Phase 4: Processing (Preparing intelligent search / vector indexing)
-            stepper_placeholder.html(render_stepper_html(active_phase=4, is_complete=False))
-            result = ingestion_service.ingest_document(processing_filename)
-            _stepper_sleep(0.4)
+                # Phase 3: Structuring (Organizing content)
+                stepper_placeholder.html(render_stepper_html(active_phase=3, is_complete=False))
+                _stepper_sleep(0.4)
 
-            # Phase 5: Ready (Available for questions — complete)
-            stepper_placeholder.html(render_stepper_html(active_phase=5, is_complete=True))
-            _stepper_sleep(0.7)
+                # Phase 4: Processing (Preparing intelligent search / vector indexing)
+                stepper_placeholder.html(render_stepper_html(active_phase=4, is_complete=False))
+                result = ingestion_service.ingest_document(fn)
+                _stepper_sleep(0.4)
 
-            st.session_state["_last_ingested_file"] = processing_filename
-            success_msg = f"{processing_filename} uploaded and indexed successfully ({result.pages} pages, {result.chunks} chunks)."
+                # Phase 5: Ready (Available for questions — complete)
+                stepper_placeholder.html(render_stepper_html(active_phase=5, is_complete=True))
+                _stepper_sleep(0.7)
+
+                succeeded.append((fn, result.pages, result.chunks))
+                processed_files.add(fn)
+                failed_files.discard(fn)
+                st.session_state["_last_ingested_file"] = fn
+            except Exception as error:
+                failed.append((fn, str(error)))
+                processed_files.add(fn)
+                failed_files.add(fn)
+                st.error(f"{fn}: processing failed — {error}")
+
+        # Always reset uploader nonce and clear session keys so uploader doesn't trap rerun
+        st.session_state["_uploader_nonce"] = uploader_nonce + 1
+        st.session_state.pop(uploader_key, None)
+        st.session_state.pop("upload_pdf_file", None)
+
+        if succeeded and not failed:
+            if len(succeeded) == 1:
+                success_msg = f"{succeeded[0][0]} uploaded and indexed successfully ({succeeded[0][1]} pages, {succeeded[0][2]} chunks)."
+            else:
+                success_msg = f"{len(succeeded)} documents uploaded and indexed successfully."
             st.session_state["_upload_success_message"] = success_msg
-            st.session_state["_uploader_nonce"] = uploader_nonce + 1
-            st.session_state.pop(uploader_key, None)
-            st.session_state.pop("upload_pdf_file", None)
             with st.container(key="upload_success_toast"):
                 st.success(success_msg)
             st.rerun()
-        except Exception as error:
-            st.error(f"{processing_filename}: processing failed — {error}")
+        elif succeeded and failed:
+            msg = f"{len(succeeded)} document{'s' if len(succeeded) != 1 else ''} indexed successfully, but {len(failed)} failed."
+            st.session_state["_upload_success_message"] = msg
+            st.rerun()
+        else:
+            # All failed
+            st.session_state["_upload_error_message"] = (
+                f"{failed[0][0]}: processing failed — {failed[0][1]}"
+                if len(failed) == 1
+                else f"Processing failed for {len(failed)} documents."
+            )
+            st.rerun()
 
     # 7. Bottom Security & Privacy Callout (NO EMOJIS, exact orange shield icon with SVG fallback)
     shield_path = Path("static/icons/security-shield.png")
