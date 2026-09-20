@@ -96,6 +96,71 @@ def test_document_is_deleted(tmp_path, monkeypatch) -> None:
     assert not document_path.exists()
 
 
+def test_document_is_deleted_removes_file_and_vectors(tmp_path, monkeypatch) -> None:
+    """Document deletion must remove both the disk file and vector store entries."""
+
+    monkeypatch.setattr(
+        document_service_module,
+        "UPLOAD_DIRECTORY",
+        tmp_path,
+    )
+
+    document_path = tmp_path / "document.pdf"
+    document_path.write_bytes(b"PDF test content")
+
+    mock_vector_store = Mock()
+    service = DocumentService(vector_store=mock_vector_store)
+
+    service.delete_document("document.pdf")
+
+    assert not document_path.exists()
+    mock_vector_store.delete_document.assert_called_once_with("document.pdf")
+
+
+def test_document_deletion_still_cleans_vectors_if_file_missing_on_disk(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    """If file is already gone from disk, vector store cleanup should still execute."""
+
+    monkeypatch.setattr(
+        document_service_module,
+        "UPLOAD_DIRECTORY",
+        tmp_path,
+    )
+
+    mock_vector_store = Mock()
+    service = DocumentService(vector_store=mock_vector_store)
+
+    service.delete_document("already_deleted.pdf")
+
+    mock_vector_store.delete_document.assert_called_once_with("already_deleted.pdf")
+
+
+def test_document_deletion_handles_vector_store_failure_gracefully(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    """Vector store errors during deletion should be logged and not crash file deletion."""
+
+    monkeypatch.setattr(
+        document_service_module,
+        "UPLOAD_DIRECTORY",
+        tmp_path,
+    )
+
+    document_path = tmp_path / "document.pdf"
+    document_path.write_bytes(b"PDF test content")
+
+    mock_vector_store = Mock()
+    mock_vector_store.delete_document.side_effect = RuntimeError("DB locked")
+    service = DocumentService(vector_store=mock_vector_store)
+
+    # Should not raise exception
+    service.delete_document("document.pdf")
+    assert not document_path.exists()
+
+
 def test_filename_is_restricted_to_storage_directory(
     tmp_path,
     monkeypatch,

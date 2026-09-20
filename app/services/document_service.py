@@ -4,13 +4,19 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
+import logging
 from pathlib import Path
 import shutil
+from typing import TYPE_CHECKING
 
 from langchain_core.documents import Document
 
 from app.rag.loader import PDFDocumentLoader
 
+if TYPE_CHECKING:
+    from app.rag.vectorstore import DocumentVectorStore
+
+logger = logging.getLogger(__name__)
 
 UPLOAD_DIRECTORY = Path("data/uploads")
 
@@ -27,9 +33,13 @@ class DocumentMetadata:
 class DocumentService:
     """Service responsible for document management and processing."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        vector_store: DocumentVectorStore | None = None,
+    ) -> None:
         UPLOAD_DIRECTORY.mkdir(parents=True, exist_ok=True)
         self.loader = PDFDocumentLoader()
+        self.vector_store = vector_store
 
     def is_valid_pdf(self, uploaded_file) -> bool:
         """Return True if the uploaded file is a PDF."""
@@ -72,13 +82,28 @@ class DocumentService:
         return documents
 
     def delete_document(self, filename: str) -> None:
-        """Delete a document if it exists."""
+        """Delete a document if it exists and remove its vector embeddings."""
 
         safe_filename = Path(filename).name
         target = UPLOAD_DIRECTORY / safe_filename
 
         if target.exists():
             target.unlink()
+
+        try:
+            vector_store = self.vector_store
+            if vector_store is None:
+                from app.rag.vectorstore import DocumentVectorStore
+
+                vector_store = DocumentVectorStore()
+
+            vector_store.delete_document(safe_filename)
+        except Exception as error:
+            logger.warning(
+                "Could not delete vectors for %s from vector store: %s",
+                safe_filename,
+                error,
+            )
 
     def extract_document(self, filename: str) -> list[Document]:
         """Extract pages from a stored PDF."""

@@ -43,4 +43,32 @@ class DocumentVectorStore:
         """Return the number of stored document chunks."""
 
         return self.store._collection.count()
-        
+
+    def delete_document(self, filename: str) -> int:
+        """Delete all document chunks associated with the specified filename.
+
+        Args:
+            filename: Name of the file whose chunks should be deleted.
+
+        Returns:
+            int: The number of deleted chunks.
+        """
+        if not filename:
+            return 0
+
+        safe_filename = Path(filename).name
+        data = self.store._collection.get(include=["metadatas"])
+
+        ids = data.get("ids") or []
+        metadatas = data.get("metadatas") or []
+
+        ids_to_delete = [
+            doc_id
+            for doc_id, meta in zip(ids, metadatas)
+            if meta and Path(meta.get("source", "")).name == safe_filename
+        ]
+
+        if ids_to_delete:
+            self.store.delete(ids=ids_to_delete)
+
+        return len(ids_to_delete)
