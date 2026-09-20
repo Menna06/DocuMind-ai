@@ -32,6 +32,7 @@ env/
 # IDE
 .idea/
 .vscode/
+.streamlit/
 *.swp
 *.swo
 *~
@@ -41,6 +42,8 @@ env/
 Thumbs.db
 
 # Application data
+.cache/
+data/chroma/
 data/uploads/*
 !data/uploads/.gitkeep
 vectorstore/*

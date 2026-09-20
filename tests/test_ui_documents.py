@@ -112,8 +112,8 @@ class TestDocumentCardComponent:
     """Test suite for the reusable render_document_card component."""
 
     def test_invalid_status_raises_value_error(self) -> None:
-        """Document status must be 'ready' or 'processing', else ValueError."""
-        with pytest.raises(ValueError, match="Document status must be 'ready' or 'processing'."):
+        """Document status must be 'ready', 'processing', or 'failed', else ValueError."""
+        with pytest.raises(ValueError, match="Document status must be 'ready', 'processing', or 'failed'."):
             render_document_card(
                 filename="test.pdf",
                 pages=1,
@@ -166,6 +166,27 @@ class TestDocumentCardComponent:
         all_html = "".join(html_calls)
         assert "document-status-processing" in all_html
         assert "Processing..." in all_html
+
+    def test_failed_status_renders_failed_badge(self, monkeypatch) -> None:
+        """Failed status must render 'Indexing Failed' badge."""
+        html_calls = []
+        monkeypatch.setattr("streamlit.html", lambda html: html_calls.append(html))
+        monkeypatch.setattr("streamlit.container", MagicMock())
+        monkeypatch.setattr("streamlit.popover", MagicMock())
+        monkeypatch.setattr("streamlit.columns", mock_columns)
+        monkeypatch.setattr("streamlit.button", lambda *args, **kwargs: False)
+
+        render_document_card(
+            filename="sample.pdf",
+            pages=5,
+            file_size="120 KB",
+            uploaded_at="2026-09-10 12:00",
+            status="failed",
+        )
+
+        all_html = "".join(html_calls)
+        assert "document-status-failed" in all_html
+        assert "Indexing Failed" in all_html
 
     def test_popover_menu_actions_returned(self, monkeypatch) -> None:
         """Clicking popover details or menu delete returns True in action dict."""
